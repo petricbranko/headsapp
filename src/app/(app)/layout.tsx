@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { paywall } from "@/edition";
 import { Logo } from "@/components/logo";
 import { Icon } from "@/components/icons";
 import SidebarExtra from "@/edition/sidebar-extra";
@@ -6,6 +8,7 @@ import { NavLinks } from "./nav-links";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
+  if (await paywall(user)) redirect("/onboarding");
   const initial = (user.name || user.email || "?").slice(0, 1).toUpperCase();
   return (
     <div className="min-h-dvh bg-bg">

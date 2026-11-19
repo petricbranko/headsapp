@@ -4,6 +4,7 @@ import { api, readJson } from "@/lib/auth";
 import { checkVerification } from "@/lib/verify";
 import { cols } from "@/lib/db";
 import { sendTestAlert } from "@/lib/alerts";
+import { canReceiveAlerts } from "@/edition";
 
 const Body = z.object({ code: z.string().min(4).max(10) });
 
@@ -13,6 +14,7 @@ export const POST = api(async ({ req, user }) => {
   const e164 = await checkVerification(user, code);
   const { users } = await cols();
   const fresh = (await users.findOne({ _id: user._id }))!;
+  if (!(await canReceiveAlerts(fresh))) return NextResponse.json({ e164, message: null });
   const msg = await sendTestAlert(fresh);
   return NextResponse.json({ e164, message: { body: msg.body, provider: msg.provider, status: msg.status, createdAt: msg.createdAt } });
 });

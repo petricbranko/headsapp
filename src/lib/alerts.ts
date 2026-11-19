@@ -4,6 +4,7 @@ import { env } from "./env";
 import { SEVERITY_RANK, type AlertDoc, type IncidentDoc, type UserDoc } from "./types";
 import { alertParts, formatAlert, sendWhatsApp } from "./whatsapp";
 import { hit } from "./rate";
+import { canReceiveAlerts } from "@/edition";
 
 /** Incidents older than this are shown in the dashboard but never pushed to WhatsApp. */
 export const FRESH_MS = 48 * 3600 * 1000;
@@ -26,6 +27,7 @@ export async function fanout(inc: IncidentDoc): Promise<{ sent: number; skipped:
 
   const cursor = users.find({ "stack.key": { $in: inc.targets }, "prefs.alertsEnabled": true, phone: { $exists: true } });
   for await (const user of cursor) {
+    if (!(await canReceiveAlerts(user))) continue;
     const target = user.stack.find((s) => inc.targets.includes(s.key))!.key;
     const base: AlertDoc = { userId: user._id!, incidentId: inc._id, kind: "incident", target, status: "skipped", createdAt: new Date() };
 
