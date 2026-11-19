@@ -3,6 +3,8 @@ import { WaText } from "./wa-text";
 export interface MockMessage {
   body: string;
   time: string;
+  /** Optional date divider shown above this message (e.g. "Monday"). */
+  day?: string;
 }
 
 /* Colors taken from WhatsApp's iOS light/dark themes so the mock reads as the real thing. */
@@ -83,17 +85,26 @@ function Wallpaper({ children, className = "" }: { children: React.ReactNode; cl
   );
 }
 
+function DayPill({ label }: { label: string }) {
+  return (
+    <div className="flex justify-center py-2">
+      <span className="rounded-lg bg-white/90 px-2.5 py-[3px] text-[11.5px] font-medium text-[#54656f] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)] dark:bg-[#182229] dark:text-[#8696a0]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 function Thread({ messages, day = "Today" }: { messages: MockMessage[]; day?: string }) {
   return (
-    <div className="space-y-1.5 px-3.5 pb-4 pt-3">
-      <div className="flex justify-center pb-2">
-        <span className="rounded-lg bg-white/90 px-2.5 py-[3px] text-[11.5px] font-medium text-[#54656f] shadow-[0_1px_0.5px_rgba(11,20,26,0.1)] dark:bg-[#182229] dark:text-[#8696a0]">
-          {day}
-        </span>
-      </div>
+    <div className="space-y-1.5 px-3.5 pb-4 pt-1">
+      {!messages[0]?.day && <DayPill label={day} />}
       {messages.map((m, i) => (
-        <div key={i} className="pl-1.5">
-          <Bubble m={m} first={i === 0} />
+        <div key={i}>
+          {m.day && <DayPill label={m.day} />}
+          <div className="pl-1.5">
+            <Bubble m={m} first={i === 0 || Boolean(m.day)} />
+          </div>
         </div>
       ))}
     </div>
