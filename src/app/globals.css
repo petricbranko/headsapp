@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #fafafa;
+  --bg-muted: #f4f4f5;
+  --fg: #0a0a0a;
+  --fg-muted: #5f5f66;
+  --fg-subtle: #8e8e96;
+  --border: #ebebee;
+  --border-strong: #dcdce0;
+  --accent: #16a34a;
+  --accent-hover: #15803d;
+  --accent-fg: #ffffff;
+  --accent-soft: #effbf3;
+  --accent-ring: rgb(22 163 74 / 0.18);
+  --danger: #dc2626;
+  --warn: #ea580c;
+  --wa-bg: #efeae2;
+  --wa-bubble: #ffffff;
+  --wa-header: #f0f2f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0a0b;
+    --bg-subtle: #111113;
+    --bg-muted: #18181b;
+    --fg: #f4f4f5;
+    --fg-muted: #a1a1aa;
+    --fg-subtle: #71717a;
+    --border: #232327;
+    --border-strong: #2e2e33;
+    --accent: #22c55e;
+    --accent-hover: #4ade80;
+    --accent-fg: #052e14;
+    --accent-soft: #0d1f14;
+    --accent-ring: rgb(34 197 94 / 0.25);
+    --wa-bg: #0b141a;
+    --wa-bubble: #202c33;
+    --wa-header: #1f2c34;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-bg-muted: var(--bg-muted);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+  --color-wa-bg: var(--wa-bg);
+  --color-wa-bubble: var(--wa-bubble);
+  --color-wa-header: var(--wa-header);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection {
+  background: var(--accent-ring);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@utility btn {
+  @apply inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 select-none whitespace-nowrap;
+}
+@utility btn-primary {
+  @apply btn bg-fg text-bg hover:opacity-90;
+}
+@utility btn-accent {
+  @apply btn bg-accent text-accent-fg hover:bg-accent-hover;
+}
+@utility btn-ghost {
+  @apply btn border border-border bg-bg text-fg hover:bg-bg-muted;
+}
+@utility btn-sm {
+  @apply h-8 px-3.5 text-[13px];
+}
+@utility input {
+  @apply h-11 w-full rounded-xl border border-border-strong bg-bg px-4 text-[15px] text-fg placeholder:text-fg-subtle outline-none transition focus:border-accent focus:ring-4 focus:ring-[var(--accent-ring)];
+}
+@utility card {
+  @apply rounded-2xl border border-border bg-bg;
+}
+@utility label {
+  @apply text-[13px] font-medium text-fg-muted;
+}
+@utility eyebrow {
+  @apply text-[12px] font-medium uppercase tracking-[0.08em] text-fg-subtle;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-in {
+  animation: fade-up 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-ring); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+.pulse-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-in, .pulse-dot { animation: none; }
+}
