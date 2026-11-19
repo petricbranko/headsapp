@@ -96,7 +96,7 @@ export function PhoneInput({
 
   return (
     <div ref={wrap} className="relative">
-      <div className="flex h-12 w-full items-stretch rounded-xl border border-border-strong bg-bg shadow-[var(--shadow-xs)] transition focus-within:border-accent focus-within:ring-[3px] focus-within:ring-[var(--accent-ring)]">
+      <div className="flex h-12 w-full items-stretch rounded-xl border border-border-strong bg-bg shadow-[var(--shadow-xs)] transition focus-within:border-fg focus-within:ring-[3px] focus-within:ring-black/[0.06]">
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}

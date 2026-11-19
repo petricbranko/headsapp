@@ -23,7 +23,7 @@ function CodeBoxes({ value, onChange, disabled }: { value: string; onChange: (v:
           autoComplete={i === 0 ? "one-time-code" : "off"}
           maxLength={1}
           aria-label={`Digit ${i + 1}`}
-          className="h-14 w-12 rounded-xl border border-border-strong bg-bg text-center text-[22px] font-medium tabular-nums shadow-[var(--shadow-xs)] outline-none transition focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-ring)] disabled:opacity-60 sm:w-14"
+          className="h-14 w-12 rounded-xl border border-border-strong bg-bg text-center text-[22px] font-medium tabular-nums shadow-[var(--shadow-xs)] outline-none transition focus:border-fg focus:ring-[3px] focus:ring-black/[0.06] disabled:opacity-60 sm:w-14"
           onChange={(e) => {
             const d = e.target.value.replace(/\D/g, "").slice(-1);
             const next = (value.slice(0, i) + d + value.slice(i + 1)).slice(0, 6);

@@ -71,7 +71,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--fg);
   outline-offset: 2px;
 }
 
@@ -104,7 +104,7 @@ body {
   @apply h-8 px-3 text-[13px];
 }
 @utility input {
-  @apply h-10 w-full rounded-lg border border-border-strong bg-bg px-3.5 text-[14px] text-fg shadow-[var(--shadow-xs)] placeholder:text-fg-subtle outline-none transition focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-ring)];
+  @apply h-10 w-full rounded-lg border border-border-strong bg-bg px-3.5 text-[14px] text-fg shadow-[var(--shadow-xs)] placeholder:text-fg-subtle outline-none transition focus:border-fg focus:ring-[3px] focus:ring-black/[0.06];
 }
 @utility card {
   @apply rounded-xl border border-border bg-bg shadow-[var(--shadow-xs)];
