@@ -25,18 +25,18 @@ export default async function AlertsPage() {
         title="Alerts"
         description={consoleMode ? "Messages sent to your WhatsApp. Twilio isn't configured here, so they're logged instead of delivered." : "Messages sent to your WhatsApp."}
       />
-      <div className="card overflow-hidden">
+      <div className="border-t border-border">
         {list.length === 0 ? (
           <p className="px-5 py-16 text-center text-[14px] text-fg-muted">No alerts yet. When something hits your stack, it shows up here.</p>
         ) : (
-          <ul className="divide-y divide-border">
+          <ul className="divide-y divide-border border-b border-border">
             {list.map((m) => {
               const s = summarizeMessage(m.body);
               const st = STATUS[m.status] ?? STATUS.logged;
               return (
                 <li key={m._id!.toString()}>
                   <details className="group">
-                    <summary className="flex cursor-pointer list-none items-center gap-4 px-5 py-3.5 transition-colors hover:bg-bg-subtle [&::-webkit-details-marker]:hidden">
+                    <summary className="flex cursor-pointer list-none items-center gap-4 py-3.5 [&::-webkit-details-marker]:hidden">
                       <span className="w-[130px] shrink-0 text-[13px] tabular-nums text-fg-muted">
                         {m.createdAt.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })}
                       </span>
@@ -49,7 +49,7 @@ export default async function AlertsPage() {
                         <path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </summary>
-                    <div className="border-t border-border bg-bg-subtle px-5 py-5">
+                    <div className="pb-5">
                       <div className="max-w-[420px]">
                         <WhatsAppBubble body={m.body} time={m.createdAt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })} />
                       </div>

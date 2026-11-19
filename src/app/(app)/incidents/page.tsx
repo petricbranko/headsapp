@@ -77,38 +77,38 @@ export default async function Incidents({ searchParams }: { searchParams: Promis
         )}
       </form>
 
-      <div className="card overflow-hidden">
+      <div>
         <table className="w-full text-left text-[14px]">
-          <thead className="border-b border-border bg-bg-subtle text-[12px] font-medium text-fg-muted">
+          <thead className="border-b border-border text-[12.5px] text-fg-muted">
             <tr>
-              <th className="w-[110px] px-5 py-2.5 font-medium">Date</th>
-              <th className="px-5 py-2.5 font-medium">Incident</th>
-              <th className="hidden w-[220px] px-5 py-2.5 font-medium md:table-cell">Affects</th>
-              <th className="w-[120px] px-5 py-2.5 font-medium">Severity</th>
-              <th className="hidden w-[130px] px-5 py-2.5 font-medium lg:table-cell">Status</th>
+              <th className="w-[110px] py-2.5 pr-5 font-normal">Date</th>
+              <th className="py-2.5 pr-5 font-normal">Incident</th>
+              <th className="hidden w-[220px] py-2.5 pr-5 font-normal md:table-cell">Affects</th>
+              <th className="w-[120px] py-2.5 pr-5 font-normal">Severity</th>
+              <th className="hidden w-[130px] py-2.5 pr-5 font-normal lg:table-cell">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {rows.map((inc) => {
               const mine = inc.targets.filter((t) => keys.includes(t));
               return (
-                <tr key={inc._id!.toString()} className="group transition-colors hover:bg-bg-subtle">
-                  <td className="whitespace-nowrap px-5 py-3.5 align-top tabular-nums text-fg-muted">{fmt(inc.publishedAt)}</td>
-                  <td className="px-5 py-3.5">
+                <tr key={inc._id!.toString()} className="group">
+                  <td className="whitespace-nowrap py-3.5 pr-5 align-top tabular-nums text-fg-muted">{fmt(inc.publishedAt)}</td>
+                  <td className="py-3.5 pr-5">
                     <Link href={`/incidents/${inc._id}`} className="font-medium text-fg hover:text-accent-text">
                       {inc.title}
                     </Link>
                   </td>
-                  <td className="hidden px-5 py-3.5 md:table-cell">
+                  <td className="hidden py-3.5 pr-5 md:table-cell">
                     <span className="flex items-center gap-2">
                       <ToolLogo stackKey={mine[0]} name={labelForKey(mine[0])} size={22} />
                       <span className="truncate text-fg-muted">{mine.map(labelForKey).join(", ")}</span>
                     </span>
                   </td>
-                  <td className="px-5 py-3.5">
+                  <td className="py-3.5 pr-5">
                     <SeverityBadge severity={inc.severity} />
                   </td>
-                  <td className="hidden px-5 py-3.5 text-[13px] lg:table-cell">
+                  <td className="hidden py-3.5 pr-5 text-[13px] lg:table-cell">
                     {marks.get(inc._id!.toString()) === "fixed" ? (
                       <span className="text-accent-text">Fixed</span>
                     ) : marks.get(inc._id!.toString()) === "not_affected" ? (

@@ -43,17 +43,17 @@ export function StackEditor({ initial, max, limitHint }: { initial: string[]; ma
         <StackBuilder value={keys} onChange={change} />
       </div>
       <aside className="h-fit xl:sticky xl:top-8">
-        <div className="card overflow-hidden">
-          <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
+        <div className="xl:border-l xl:border-border xl:pl-8">
+          <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="text-[14px] font-semibold">
               Your stack <span className="font-normal text-fg-subtle">· {keys.length}{max < 500 ? ` of ${max}` : ""}</span>
             </div>
             <span className={`text-[12px] ${status === "error" ? "text-danger" : "text-fg-subtle"}`}>{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : ""}</span>
           </div>
-          <div className="max-h-[60vh] overflow-y-auto p-2">
+          <div className="-mx-2 max-h-[60vh] overflow-y-auto py-2">
             <SelectedStack value={keys} onRemove={(k) => change(keys.filter((x) => x !== k))} empty="Pick tools on the left to start monitoring." />
           </div>
-          {error && <div className="border-t border-border px-4 py-3 text-[13px] text-danger">{error}</div>}
+          {error && <div className="pt-3 text-[13px] text-danger">{error}</div>}
         </div>
       </aside>
     </div>

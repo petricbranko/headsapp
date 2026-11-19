@@ -1,18 +1,14 @@
 import type { Severity } from "@/lib/types";
 
-const STYLES: Record<Severity, { color: string; bg: string; label: string }> = {
-  critical: { color: "var(--sev-critical)", bg: "#fdecec", label: "Critical" },
-  high: { color: "var(--sev-high)", bg: "#fef0e6", label: "High" },
-  medium: { color: "#b98a00", bg: "#fdf6dc", label: "Medium" },
-  low: { color: "var(--sev-low)", bg: "#f3f3f5", label: "Low" },
-};
+const LABEL: Record<Severity, string> = { critical: "Critical", high: "High", medium: "Medium", low: "Low" };
+/* Colour is reserved for what needs action: only critical/high get a dot. */
+const DOT: Partial<Record<Severity, string>> = { critical: "bg-[#e5484d]", high: "bg-[#f76b15]" };
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
-  const s = STYLES[severity];
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[12px] font-medium" style={{ color: s.color, background: s.bg }}>
-      <span className="size-1.5 rounded-full" style={{ background: s.color }} />
-      {s.label}
+    <span className="inline-flex items-center gap-1.5 text-[13px] text-fg-muted">
+      {DOT[severity] && <span className={`size-1.5 rounded-full ${DOT[severity]}`} />}
+      {LABEL[severity]}
     </span>
   );
 }

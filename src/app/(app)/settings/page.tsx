@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   return (
     <div>
       <PageHeader title="Settings" />
-      <div className="space-y-5">
+      <div className="max-w-[1000px]">
         <SettingsCard title="WhatsApp number" description="Where alerts are sent. We verify it with a one-time code.">
           <PhoneSection phone={user.phone?.e164} display={user.phone ? formatPhone(user.phone.e164) : undefined} />
         </SettingsCard>

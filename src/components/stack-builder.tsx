@@ -53,32 +53,27 @@ function Tabs({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   );
 }
 
-function Check() {
-  return (
-    <span className="grid size-[18px] place-items-center rounded-full bg-accent text-white">
-      <svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true">
-        <path d="M2.5 6.5 5 9l4.5-5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </span>
-  );
-}
-
 function ToolCard({ stackKey, name, sub, selected, onClick }: { stackKey: string; name: string; sub: string; selected: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`group relative flex items-center gap-3 rounded-xl border bg-bg px-3.5 py-3 text-left transition-all ${
-        selected ? "border-accent shadow-[0_0_0_3px_var(--accent-ring)]" : "border-border shadow-[var(--shadow-xs)] hover:border-border-strong hover:shadow-[var(--shadow-sm)]"
-      }`}
+      className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${selected ? "bg-bg-muted" : "hover:bg-bg-hover"}`}
     >
-      <ToolLogo stackKey={stackKey} name={name} size={34} />
+      <ToolLogo stackKey={stackKey} name={name} size={32} />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[14px] font-medium text-fg">{name}</span>
-        <span className="block truncate text-[12px] text-fg-subtle">{sub}</span>
+        <span className="block truncate text-[12.5px] text-fg-subtle">{sub}</span>
       </span>
-      {selected && <Check />}
+      <span
+        className={`grid size-5 shrink-0 place-items-center rounded-full transition-colors ${selected ? "bg-fg text-white" : "border border-border-strong text-transparent group-hover:border-fg-subtle"}`}
+        aria-hidden="true"
+      >
+        <svg width="10" height="10" viewBox="0 0 12 12">
+          <path d="M2.5 6.5 5 9l4.5-5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
     </button>
   );
 }
@@ -139,7 +134,7 @@ function Browse({ selected, toggle, add }: { selected: Set<string>; toggle: (k: 
               >
                 {c}
                 {n > 0 && (
-                  <span className={`min-w-[18px] rounded-full px-1 text-center text-[11px] font-semibold tabular-nums ${cat === c ? "bg-white/20 text-white" : "bg-accent-soft text-accent-text"}`}>{n}</span>
+                  <span className={`text-[12px] tabular-nums ${cat === c ? "text-white/70" : "text-fg-subtle"}`}>{n}</span>
                 )}
               </button>
             );
@@ -147,7 +142,7 @@ function Browse({ selected, toggle, add }: { selected: Set<string>; toggle: (k: 
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="-mx-3 grid grid-cols-1 gap-x-4 gap-y-0.5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {entries.map((e) => (
           <ToolCard key={e.slug} stackKey={vendorKey(e.slug)} name={e.name} sub={e.category} selected={selected.has(vendorKey(e.slug))} onClick={() => toggle(vendorKey(e.slug))} />
         ))}

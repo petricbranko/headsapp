@@ -32,9 +32,9 @@ export function NavLinks({ variant = "sidebar" }: { variant?: "sidebar" | "top" 
           <Link
             key={l.href}
             href={l.href}
-            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[14px] transition-colors ${active ? "bg-bg text-fg shadow-[var(--shadow-xs),inset_0_0_0_1px_var(--border)] font-medium" : "text-fg-muted hover:bg-bg-hover hover:text-fg"}`}
+            className={`flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[14px] transition-colors ${active ? "bg-bg-muted font-medium text-fg" : "text-fg-muted hover:bg-bg-hover hover:text-fg"}`}
           >
-            <span className={active ? "text-accent" : "text-fg-subtle"}>
+            <span className={active ? "text-fg" : "text-fg-subtle"}>
               <Icon name={l.icon} />
             </span>
             {l.label}

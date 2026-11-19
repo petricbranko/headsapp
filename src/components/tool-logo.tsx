@@ -15,10 +15,10 @@ function tile(name: string) {
 export function ToolLogo({ stackKey, name, size = 32 }: { stackKey: string; name: string; size?: number }) {
   const [kind, slug] = [stackKey.split(":")[0], stackKey.slice(stackKey.indexOf(":") + 1)];
   const logo = kind === "vendor" ? LOGOS[slug] : undefined;
-  const inner = Math.round(size * 0.55);
+  const inner = Math.round(size * 0.56);
   return (
     <span
-      className="grid shrink-0 place-items-center overflow-hidden rounded-[9px] border border-border bg-bg shadow-[var(--shadow-xs)]"
+      className="grid shrink-0 place-items-center overflow-hidden rounded-[9px] bg-bg-muted"
       style={{ width: size, height: size, borderRadius: Math.max(6, size * 0.28) }}
       aria-hidden="true"
     >

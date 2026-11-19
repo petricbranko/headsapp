@@ -129,7 +129,7 @@ export function Onboarding({
               </div>
             </div>
           </main>
-          <aside className="flex flex-col border-t border-border bg-bg-subtle lg:sticky lg:top-0 lg:h-[calc(100dvh-64px)] lg:border-l lg:border-t-0">
+          <aside className="flex flex-col border-t border-border bg-bg lg:sticky lg:top-0 lg:h-[calc(100dvh-64px)] lg:border-l lg:border-t-0">
             <div className="flex items-center justify-between px-6 pb-3 pt-6">
               <div className="text-[14px] font-semibold">Your stack</div>
               <div className="text-[13px] tabular-nums text-fg-subtle">
@@ -155,7 +155,7 @@ export function Onboarding({
                 </div>
               )}
             </div>
-            <div className="space-y-3 border-t border-border bg-bg-subtle p-6">
+            <div className="space-y-3 border-t border-border p-6">
               {overLimit && <p className="text-[13px] leading-relaxed text-fg-muted">{limitHint ?? `You can monitor up to ${max} tools.`}</p>}
               {error && <p className="text-[13px] text-danger">{error}</p>}
               <button className="btn-primary btn-lg w-full" disabled={!keys.length || busy || overLimit} onClick={saveStack}>

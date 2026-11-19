@@ -57,14 +57,14 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
       <h1 className="heading mt-3 text-[30px] leading-[1.15]">{inc.title}</h1>
       <div className="mt-5 flex flex-wrap gap-2">
         {mine.map((k) => (
-          <span key={k} className="inline-flex items-center gap-2 rounded-lg border border-border bg-bg py-1 pl-1 pr-2.5 text-[13px]">
+          <span key={k} className="inline-flex items-center gap-2 text-[14px] text-fg-muted">
             <ToolLogo stackKey={k} name={labelForKey(k)} size={22} />
             {labelForKey(k)}
           </span>
         ))}
       </div>
 
-      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_260px] [&>*]:min-w-0">
+      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_280px] [&>*]:min-w-0">
         <div className="space-y-8">
           <section>
             <h2 className="text-[15px] font-semibold tracking-[-0.01em]">What happened</h2>
@@ -75,7 +75,7 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
             <ol className="mt-3 space-y-2.5">
               {inc.whatToDo.map((s, i) => (
                 <li key={i} className="flex gap-3 text-[15px] leading-[1.6]">
-                  <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-accent-soft text-[12px] font-semibold text-accent-text">{i + 1}</span>
+                  <span className="w-4 shrink-0 tabular-nums text-fg-subtle">{i + 1}.</span>
                   {s}
                 </li>
               ))}
@@ -85,17 +85,17 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
             Read the full report <Icon name="external" size={14} />
           </a>
         </div>
-        <aside className="h-fit space-y-4 lg:sticky lg:top-8">
-          <div className="card p-5">
-            <div className="text-[14px] font-semibold">Dealt with it?</div>
-            <p className="mt-1 text-[13px] leading-relaxed text-fg-muted">Mark it so it leaves your attention list. You can undo this anytime.</p>
-            <div className="mt-4">
+        <aside className="h-fit space-y-8 border-t border-border pt-6 text-[14px] lg:sticky lg:top-8 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+          <div>
+            <div className="font-semibold">Dealt with it?</div>
+            <p className="mt-1 text-[13.5px] leading-relaxed text-fg-muted">Mark it so it leaves your attention list.</p>
+            <div className="mt-3">
               <IncidentActions id={inc._id!.toString()} state={mark?.state} />
             </div>
           </div>
-          <div className="card p-5 text-[13px]">
-            <div className="text-[14px] font-semibold">WhatsApp alert</div>
-            <p className={`mt-1 leading-relaxed ${sent ? "text-accent-text" : "text-fg-muted"}`}>{sent ? why : `Not sent. ${why}`}</p>
+          <div>
+            <div className="font-semibold">WhatsApp alert</div>
+            <p className="mt-1 text-[13.5px] leading-relaxed text-fg-muted">{sent ? why : `Not sent. ${why}`}</p>
           </div>
         </aside>
       </div>

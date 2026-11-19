@@ -30,11 +30,10 @@ export function PhoneSection({ phone, display }: { phone?: string; display?: str
     );
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
+      <div className="flex items-center justify-between">
         <div>
           <div className="text-[15px] font-medium tabular-nums">{display ?? phone}</div>
-          <div className="mt-0.5 inline-flex items-center gap-1.5 text-[12.5px] text-accent-text">
-            <span className="size-1.5 rounded-full bg-accent" />
+          <div className="mt-0.5 text-[13px] text-fg-muted">
             Verified
           </div>
         </div>
@@ -104,7 +103,7 @@ export function AlertPrefs({ enabled, minSeverity, hasPhone }: { enabled: boolea
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-3 border-t border-border pt-5">
+      <div className="flex items-center gap-3">
         <button
           className="btn-secondary"
           disabled={!hasPhone}
