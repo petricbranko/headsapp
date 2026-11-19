@@ -10,22 +10,18 @@ function Chip({ selected, onClick, children, title }: { selected: boolean; onCli
       title={title}
       onClick={onClick}
       aria-pressed={selected}
-      className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[14px] transition-all ${
+      className={`inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[14px] transition-[background-color,color,box-shadow] duration-150 ${
         selected
-          ? "border-accent bg-accent-soft text-fg shadow-[inset_0_0_0_0.5px_var(--accent)]"
-          : "border-border bg-bg text-fg-muted hover:border-border-strong hover:text-fg"
+          ? "bg-fg text-bg shadow-[inset_0_0_0_1px_var(--fg)]"
+          : "bg-bg-raised text-fg shadow-[inset_0_0_0_1px_var(--border-strong)] hover:shadow-[inset_0_0_0_1px_var(--fg-subtle)]"
       }`}
     >
-      {selected ? (
-        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" className="text-accent">
+      {children}
+      {selected && (
+        <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true" className="-mr-0.5 opacity-80">
           <path d="M3.5 8.5 6.5 11.5 12.5 4.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-      ) : (
-        <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" className="opacity-50">
-          <path d="M8 3.5v9M3.5 8h9" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
       )}
-      {children}
     </button>
   );
 }
@@ -80,7 +76,7 @@ export function StackPicker({ value, onChange, autoFocus }: { value: string[]; o
           {npmCandidate && (
             <Chip selected={selected.has(npmKey(npmCandidate))} onClick={() => toggle(npmKey(npmCandidate))} title="Watch this npm package for advisories and malware">
               <span className="font-mono text-[13px]">{npmCandidate}</span>
-              <span className="text-[12px] text-fg-subtle">npm package</span>
+              <span className="text-[12px] opacity-60">npm</span>
             </Chip>
           )}
           {!results.length && !npmCandidate && <p className="text-sm text-fg-subtle">No matches. Try a product name or an npm package name.</p>}
@@ -89,7 +85,7 @@ export function StackPicker({ value, onChange, autoFocus }: { value: string[]; o
         <div className="space-y-5 animate-in">
           {CATEGORIES.map((c) => (
             <div key={c}>
-              <div className="eyebrow mb-2">{c}</div>
+              <div className="mb-2.5 text-[13px] text-fg-subtle">{c}</div>
               <div className="flex flex-wrap gap-2">
                 {CATALOG.filter((e) => e.category === c).map((e) => (
                   <Chip key={e.slug} selected={selected.has(vendorKey(e.slug))} onClick={() => toggle(vendorKey(e.slug))}>
@@ -112,7 +108,7 @@ export function StackPicker({ value, onChange, autoFocus }: { value: string[]; o
               </Chip>
             ))}
           </div>
-          <button type="button" className="text-sm text-fg-muted underline-offset-4 hover:text-fg hover:underline" onClick={() => setShowAll(true)}>
+          <button type="button" className="text-[14px] text-fg-muted underline decoration-border-strong underline-offset-4 hover:text-fg hover:decoration-fg" onClick={() => setShowAll(true)}>
             Browse all {CATALOG.length} tools
           </button>
         </div>
@@ -120,7 +116,7 @@ export function StackPicker({ value, onChange, autoFocus }: { value: string[]; o
 
       {packages.length > 0 && (
         <div>
-          <div className="eyebrow mb-2">npm packages</div>
+          <div className="mb-2.5 text-[13px] text-fg-subtle">npm packages</div>
           <div className="flex flex-wrap gap-2">
             {packages.map((k) => (
               <Chip key={k} selected onClick={() => toggle(k)} title="Click to remove">

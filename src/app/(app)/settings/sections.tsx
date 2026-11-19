@@ -23,10 +23,10 @@ export function PhoneSection({ phone }: { phone?: string }) {
     );
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between rounded-xl border border-border px-4 py-3">
+      <div className="flex items-center justify-between">
         <div>
-          <div className="font-mono text-[15px]">{phone}</div>
-          <div className="text-[12px] text-accent">Verified</div>
+          <div className="text-[15px] tabular-nums">{phone}</div>
+          <div className="mt-0.5 inline-flex items-center gap-1.5 text-[13px] text-fg-muted"><span className="size-1.5 rounded-full bg-accent" />Verified</div>
         </div>
         <button className="btn-ghost btn-sm" onClick={() => setEditing(true)}>
           Change
@@ -66,12 +66,12 @@ export function AlertPrefs({ enabled, minSeverity, hasPhone }: { enabled: boolea
             setOn(!on);
             save({ alertsEnabled: !on });
           }}
-          className={`relative h-6 w-10 rounded-full transition-colors ${on ? "bg-accent" : "bg-border-strong"}`}
+          className={`relative h-6 w-10 rounded-full transition-colors ${on ? "bg-fg" : "bg-border-strong"}`}
         >
-          <span className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-all ${on ? "left-[18px]" : "left-0.5"}`} />
+          <span className={`absolute top-0.5 size-5 rounded-full bg-bg-raised shadow-sm transition-all ${on ? "left-[18px]" : "left-0.5"}`} />
         </button>
       </label>
-      <div className="inline-flex rounded-full border border-border p-0.5" role="radiogroup" aria-label="Minimum severity">
+      <div className="inline-flex rounded-full bg-bg-muted p-1" role="radiogroup" aria-label="Minimum severity">
         {LEVELS.map((l) => (
           <button
             key={l.v}
@@ -81,7 +81,7 @@ export function AlertPrefs({ enabled, minSeverity, hasPhone }: { enabled: boolea
               setLevel(l.v);
               save({ minSeverity: l.v });
             }}
-            className={`rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${level === l.v ? "bg-fg text-bg" : "text-fg-muted hover:text-fg"}`}
+            className={`rounded-full px-3.5 py-1.5 text-[13px] transition-all ${level === l.v ? "bg-bg-raised text-fg shadow-[0_1px_2px_rgba(0,0,0,0.08)]" : "text-fg-muted hover:text-fg"}`}
           >
             {l.label}
           </button>
@@ -115,7 +115,7 @@ export function DangerZone() {
   const [armed, setArmed] = useState(false);
   return (
     <button
-      className={`btn-sm btn ${armed ? "bg-danger text-white" : "text-danger hover:bg-bg-muted"}`}
+      className={`btn-sm btn ${armed ? "bg-danger text-white" : "text-fg-muted hover:text-danger"}`}
       onClick={async () => {
         if (!armed) {
           setArmed(true);

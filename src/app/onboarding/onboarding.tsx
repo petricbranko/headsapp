@@ -52,22 +52,20 @@ export function Onboarding({ initialStack, hasPhone, phone, consoleMode, max, li
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-xl flex-col px-6 pb-16 pt-8">
+    <main className="mx-auto flex min-h-dvh max-w-xl flex-col px-6 pb-16 pt-6">
       <header className="flex items-center justify-between">
         <Logo href="/dashboard" />
-        <div className="flex items-center gap-1.5" aria-label={`Step ${step + 1} of 3`}>
-          {[0, 1, 2].map((i) => (
-            <span key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? "w-6 bg-fg" : i < step ? "w-1.5 bg-fg" : "w-1.5 bg-border-strong"}`} />
-          ))}
-        </div>
+        <span className="text-[13px] tabular-nums text-fg-subtle" aria-label={`Step ${step + 1} of 3`}>
+          {step + 1} <span className="opacity-60">/</span> 3
+        </span>
       </header>
 
-      <div className="mt-16 flex-1 sm:mt-20">
+      <div className="mt-14 flex-1 sm:mt-24">
         {step === 0 && (
           <section key="s0" className="animate-in">
-            <h1 className="text-[32px] font-semibold leading-tight tracking-tight">What&apos;s in your stack?</h1>
-            <p className="mt-3 text-[16px] text-fg-muted">Pick the tools you depend on. We&apos;ll only message you when one of them has a security incident.</p>
-            <div className="mt-8">
+            <h1 className="display text-[42px] sm:text-[48px]">What&apos;s in your stack?</h1>
+            <p className="mt-4 text-[16px] leading-relaxed text-fg-muted">Pick the tools you depend on. We&apos;ll only message you when one of them has a security incident.</p>
+            <div className="mt-10">
               <StackPicker value={keys} onChange={setKeys} />
             </div>
             {error && <p className="mt-4 text-sm text-danger">{error}</p>}
@@ -86,8 +84,8 @@ export function Onboarding({ initialStack, hasPhone, phone, consoleMode, max, li
 
         {step === 1 && (
           <section key="s1" className="animate-in">
-            <h1 className="text-[32px] font-semibold leading-tight tracking-tight">Where should we message you?</h1>
-            <p className="mt-3 text-[16px] text-fg-muted">Your WhatsApp number. Alerts go here, along with a test message right now.</p>
+            <h1 className="display text-[42px] sm:text-[48px]">Where should we message you?</h1>
+            <p className="mt-4 text-[16px] leading-relaxed text-fg-muted">Your WhatsApp number. Alerts go here, along with a test message right now.</p>
             <div className="mt-8">
               <PhoneVerify
                 onVerified={async (e164) => {
@@ -112,11 +110,11 @@ export function Onboarding({ initialStack, hasPhone, phone, consoleMode, max, li
 
         {step === 2 && (
           <section key="s2" className="animate-in">
-            <div className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-[13px] font-medium text-accent">
-              <span className="size-1.5 rounded-full bg-accent pulse-dot" /> Watching {keys.length} tool{keys.length === 1 ? "" : "s"}
+            <div className="inline-flex items-center gap-2 text-[14px] text-fg">
+              <span className="size-[7px] rounded-full bg-accent pulse-dot" /> Watching {keys.length} tool{keys.length === 1 ? "" : "s"}
             </div>
-            <h1 className="mt-5 text-[32px] font-semibold leading-tight tracking-tight">You&apos;re set. Check WhatsApp.</h1>
-            <p className="mt-3 text-[16px] text-fg-muted">
+            <h1 className="display mt-4 text-[42px] sm:text-[48px]">You&apos;re set. <span className="italic text-fg-muted">Check WhatsApp.</span></h1>
+            <p className="mt-4 text-[16px] leading-relaxed text-fg-muted">
               {consoleMode ? (
                 <>We just sent your test alert. Twilio isn&apos;t configured here, so it was printed to the server console instead. This is what it looks like:</>
               ) : (

@@ -10,11 +10,11 @@ export default async function LoginPage() {
   const mode = authMode();
 
   return (
-    <main className="grid min-h-dvh place-items-center px-6">
-      <div className="w-full max-w-sm animate-in">
-        <Logo href="/" />
-        <h1 className="mt-10 text-[28px] font-semibold tracking-tight">Sign in</h1>
-        <p className="mt-2 text-[15px] text-fg-muted">Watch your stack. Get a WhatsApp message when it matters.</p>
+    <main className="flex min-h-dvh flex-col px-6">
+      <div className="py-6"><Logo href="/" /></div>
+      <div className="mx-auto flex w-full max-w-[360px] flex-1 flex-col justify-center pb-24 animate-in">
+        <h1 className="display text-[44px]">Welcome <span className="italic text-fg-muted">back.</span></h1>
+        <p className="mt-4 text-[15px] text-fg-muted">Sign in to see what&apos;s happening with your stack.</p>
 
         {mode === "auth0" && (
           <div className="mt-8 space-y-3">
@@ -29,9 +29,9 @@ export default async function LoginPage() {
 
         {mode === "dev" && (
           <form action="/api/dev/login" method="post" className="mt-8 space-y-3">
-            <input name="email" type="email" className="input" defaultValue="dev@localhost" aria-label="Email" />
+            <input name="email" type="email" className="input" defaultValue="dev@localhost" aria-label="Email" autoComplete="email" />
             <button className="btn-primary h-11 w-full">Continue</button>
-            <p className="pt-2 text-[13px] leading-relaxed text-fg-subtle">
+            <p className="pt-3 text-[13px] leading-relaxed text-fg-subtle">
               Local dev login. Auth0 isn&apos;t configured, so any email signs you in as a local test user. This is disabled in production builds.
             </p>
           </form>

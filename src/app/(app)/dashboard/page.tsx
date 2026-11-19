@@ -13,7 +13,11 @@ import { SEVERITY_RANK } from "@/lib/types";
 
 export const metadata = { title: "Dashboard" };
 
-const SOURCE_LABEL: Record<string, string> = { ghsa: "Advisory", kev: "Actively exploited", status: "Status page", news: "News" };
+const SOURCE_LABEL: Record<string, string> = { ghsa: "GitHub advisory", kev: "Actively exploited", status: "Status page", news: "News" };
+
+function day(d: Date) {
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
 
 export default async function Dashboard({ searchParams }: { searchParams: Promise<{ all?: string }> }) {
   const showAll = (await searchParams).all === "1";
@@ -31,29 +35,39 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           .toArray()
       : [],
     alerts.find({ userId: user._id, kind: "incident", status: { $in: ["sent", "logged"] } }, { projection: { incidentId: 1 } }).toArray(),
-    messages.find({ userId: user._id, kind: { $ne: "verify" } }).sort({ createdAt: -1 }).limit(6).toArray(),
+    messages.find({ userId: user._id, kind: { $ne: "verify" } }).sort({ createdAt: -1 }).limit(4).toArray(),
     sources.find().toArray(),
   ]);
   const alertedIds = new Set(alerted.map((a) => a.incidentId?.toString()));
   const lastRun = sourceStates.map((s) => s.lastRunAt).filter(Boolean).sort((a, b) => b!.getTime() - a!.getTime())[0];
   const consoleMode = messagingMode() === "console";
   const weekAgo = Date.now() - 7 * 864e5;
-  const relevant = feed.filter((i) => SEVERITY_RANK[i.severity] >= SEVERITY_RANK[user.prefs.minSeverity] && i.publishedAt.getTime() > weekAgo);
+  const thisWeek = feed.filter((i) => SEVERITY_RANK[i.severity] >= SEVERITY_RANK[user.prefs.minSeverity] && i.publishedAt.getTime() > weekAgo);
 
   return (
-    <div className="space-y-10">
-      <section className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <section className="flex flex-col gap-6 pb-12 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="inline-flex items-center gap-2 text-[13px] font-medium text-accent">
-            <span className="size-1.5 rounded-full bg-accent pulse-dot" />
-            Watching {keys.length} tool{keys.length === 1 ? "" : "s"}
-          </div>
-          <h1 className="mt-2 text-[28px] font-semibold tracking-tight">
-            {relevant.length ? `${relevant.length} incident${relevant.length === 1 ? "" : "s"} hit your stack this week` : "All quiet on your stack this week"}
+          <h1 className="display text-[44px] sm:text-[52px]">
+            {thisWeek.length ? (
+              <>
+                {thisWeek.length} {thisWeek.length === 1 ? "incident" : "incidents"} <span className="italic text-fg-muted">this week.</span>
+              </>
+            ) : (
+              <>
+                All quiet <span className="italic text-fg-muted">this week.</span>
+              </>
+            )}
           </h1>
-          <p className="mt-1.5 text-[15px] text-fg-muted">
-            {user.phone ? <>Alerts go to {maskPhone(user.phone.e164)} on WhatsApp.</> : <>Add your WhatsApp number to get alerts.</>}{" "}
-            {lastRun ? <>Sources checked {timeAgo(lastRun)}.</> : <>First check is running…</>}
+          <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-fg-muted">
+            <span className="inline-flex items-center gap-2 text-fg">
+              <span className="size-[7px] rounded-full bg-accent pulse-dot" />
+              Watching {keys.length} {keys.length === 1 ? "tool" : "tools"}
+            </span>
+            <span className="text-fg-subtle">·</span>
+            {user.phone ? <span>Alerts to {maskPhone(user.phone.e164)}</span> : <Link href="/settings" className="text-fg underline decoration-border-strong underline-offset-4">Add WhatsApp number</Link>}
+            <span className="text-fg-subtle">·</span>
+            <span>{lastRun ? `Checked ${timeAgo(lastRun)}` : "First check running"}</span>
           </p>
         </div>
         <div className="flex gap-2">
@@ -65,74 +79,73 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       </section>
 
       {!user.phone && (
-        <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-border bg-bg-subtle p-5 sm:flex-row sm:items-center">
+        <div className="mb-10 flex flex-col items-start justify-between gap-4 rounded-2xl bg-bg-subtle px-6 py-5 sm:flex-row sm:items-center">
           <div>
             <div className="text-[15px] font-medium">You won&apos;t get alerts yet</div>
             <div className="text-[14px] text-fg-muted">Add your WhatsApp number. It takes 20 seconds.</div>
           </div>
-          <Link href="/settings" className="btn-accent btn-sm">
-            Add WhatsApp number
+          <Link href="/settings" className="btn-primary btn-sm">
+            Add number
           </Link>
         </div>
       )}
 
-      {consoleMode && (
-        <p className="rounded-xl border border-dashed border-border-strong px-4 py-3 text-[13px] text-fg-muted">
-          Local mode: Twilio isn&apos;t configured, so WhatsApp messages are printed to the server console and shown under <span className="text-fg">Messages</span>.
-        </p>
-      )}
-
-      <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
+      <div className="grid gap-14 lg:grid-cols-[1fr_340px]">
         <section>
-          <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="eyebrow">{showAll ? "All incidents for your stack" : "Recent incidents for your stack"}</h2>
-            <Link href={showAll ? "/dashboard" : "/dashboard?all=1"} className="text-[12px] text-fg-subtle hover:text-fg">
-              {showAll ? "Show recent" : "Show all"}
+          <div className="mb-2 flex items-baseline justify-between border-b border-border pb-3">
+            <h2 className="text-[14px] font-medium">{showAll ? "All incidents" : "Recent incidents"}</h2>
+            <Link href={showAll ? "/dashboard" : "/dashboard?all=1"} className="text-[13px] text-fg-subtle hover:text-fg">
+              {showAll ? "Recent only" : "View all"}
             </Link>
           </div>
           {feed.length === 0 ? (
-            <div className="card px-6 py-14 text-center">
-              <div className="text-[15px] font-medium">Nothing has hit your stack.</div>
-              <p className="mt-1 text-[14px] text-fg-muted">That&apos;s the goal. When something does, it shows up here and on WhatsApp.</p>
+            <div className="py-16">
+              <p className="display text-[26px]">Nothing has hit your stack.</p>
+              <p className="mt-2 text-[14px] text-fg-muted">That&apos;s the goal. When something does, it shows up here and on WhatsApp.</p>
             </div>
           ) : (
-            <ul className="card divide-y divide-border overflow-hidden">
+            <ul className="divide-y divide-border">
               {feed.map((inc) => {
                 const mine = inc.targets.filter((t) => keys.includes(t));
                 return (
                   <li key={inc._id!.toString()}>
                     <details className="group">
-                      <summary className="flex cursor-pointer list-none gap-4 px-5 py-4 transition-colors hover:bg-bg-subtle [&::-webkit-details-marker]:hidden">
+                      <summary className="-mx-3 flex cursor-pointer list-none gap-5 rounded-xl px-3 py-4 transition-colors hover:bg-bg-subtle [&::-webkit-details-marker]:hidden">
+                        <div className="w-14 shrink-0 pt-[2px] text-[13px] tabular-nums text-fg-subtle">{day(inc.publishedAt)}</div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <div className="text-[15px] font-medium leading-snug tracking-[-0.005em] text-fg">{inc.title}</div>
+                          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12.5px] text-fg-muted">
                             <SeverityBadge severity={inc.severity} />
-                            {mine.slice(0, 3).map((t) => (
-                              <span key={t} className="rounded-md bg-bg-muted px-1.5 py-0.5 text-[12px] font-medium text-fg-muted">
-                                {labelForKey(t)}
-                              </span>
-                            ))}
-                            <span className="text-[12px] text-fg-subtle">{SOURCE_LABEL[inc.source]}</span>
-                            {alertedIds.has(inc._id!.toString()) && <span className="text-[12px] font-medium text-accent">Alerted</span>}
+                            <span className="text-fg-subtle">·</span>
+                            <span>{mine.slice(0, 3).map(labelForKey).join(", ")}</span>
+                            <span className="text-fg-subtle">·</span>
+                            <span>{SOURCE_LABEL[inc.source]}</span>
+                            {alertedIds.has(inc._id!.toString()) && (
+                              <>
+                                <span className="text-fg-subtle">·</span>
+                                <span className="text-accent">Sent to WhatsApp</span>
+                              </>
+                            )}
                           </div>
-                          <div className="mt-1.5 text-[15px] font-medium leading-snug text-fg">{inc.title}</div>
                         </div>
-                        <div className="shrink-0 pt-0.5 text-[12px] text-fg-subtle">{timeAgo(inc.publishedAt)}</div>
+                        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="mt-1.5 shrink-0 text-fg-subtle transition-transform group-open:rotate-90">
+                          <path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                       </summary>
-                      <div className="space-y-4 px-5 pb-5 text-[14px] leading-relaxed">
+                      <div className="pb-6 pl-[76px] pr-6 text-[14px] leading-relaxed">
                         <p className="text-fg-muted">{inc.whatHappened}</p>
-                        <div>
-                          <div className="mb-1.5 text-[13px] font-medium">What to do</div>
-                          <ul className="space-y-1 text-fg-muted">
-                            {inc.whatToDo.map((s, i) => (
-                              <li key={i} className="flex gap-2">
-                                <span className="text-accent">→</span>
-                                {s}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <a href={inc.url} target="_blank" rel="noopener noreferrer nofollow" className="inline-block text-[13px] text-fg underline underline-offset-4">
-                          {inc.sourceName} ↗
+                        <div className="mt-4 text-[13px] font-medium">What to do</div>
+                        <ol className="mt-1.5 space-y-1 text-fg-muted">
+                          {inc.whatToDo.map((s, i) => (
+                            <li key={i} className="flex gap-2.5">
+                              <span className="tabular-nums text-fg-subtle">{i + 1}.</span>
+                              {s}
+                            </li>
+                          ))}
+                        </ol>
+                        <a href={inc.url} target="_blank" rel="noopener noreferrer nofollow" className="mt-4 inline-flex items-center gap-1 text-[13px] text-fg underline decoration-border-strong underline-offset-4 hover:decoration-fg">
+                          Read on {inc.sourceName}
+                          <span aria-hidden>↗</span>
                         </a>
                       </div>
                     </details>
@@ -144,13 +157,18 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         </section>
 
         <aside>
-          <h2 className="eyebrow mb-3">Messages</h2>
+          <div className="mb-4 flex items-baseline justify-between border-b border-border pb-3">
+            <h2 className="text-[14px] font-medium">WhatsApp</h2>
+            <span className="text-[13px] text-fg-subtle">{consoleMode ? "Local mode" : "Live"}</span>
+          </div>
           {recentMessages.length ? (
             <WhatsAppMock messages={recentMessages.reverse().map((m) => ({ body: m.body, time: clock(m.createdAt) }))} />
           ) : (
-            <div className="card px-5 py-8 text-center text-[14px] text-fg-muted">No messages yet.</div>
+            <p className="text-[14px] text-fg-muted">No messages yet.</p>
           )}
-          {recentMessages.length > 0 && <p className="mt-2 text-[12px] text-fg-subtle">{consoleMode ? "Logged locally, not sent." : "Delivered via WhatsApp."}</p>}
+          {consoleMode && (
+            <p className="mt-3 text-[12.5px] leading-relaxed text-fg-subtle">Twilio isn&apos;t configured, so messages are printed to the server console and shown here.</p>
+          )}
         </aside>
       </div>
     </div>

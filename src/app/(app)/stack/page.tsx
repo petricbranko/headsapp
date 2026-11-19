@@ -9,9 +9,9 @@ export default async function StackPage() {
   const { max } = await stackLimit(user);
   return (
     <div className="max-w-2xl">
-      <h1 className="text-[28px] font-semibold tracking-tight">Your stack</h1>
-      <p className="mt-1.5 text-[15px] text-fg-muted">Everything you pick here is watched around the clock. Changes save automatically.</p>
-      <div className="mt-8">
+      <h1 className="display text-[44px] sm:text-[52px]">Your stack</h1>
+      <p className="mt-4 text-[15px] text-fg-muted">Everything you pick here is watched around the clock. Changes save automatically.</p>
+      <div className="mt-10">
         <StackEditor initial={user.stack.map((s) => s.key)} max={max} />
       </div>
     </div>

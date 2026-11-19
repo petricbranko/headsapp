@@ -11,7 +11,7 @@ export const metadata = { title: "Settings" };
 
 function Row({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) {
   return (
-    <section className="grid gap-4 border-t border-border py-8 sm:grid-cols-[220px_1fr]">
+    <section className="grid gap-5 border-t border-border py-10 sm:grid-cols-[220px_1fr] sm:gap-10">
       <div>
         <h2 className="text-[15px] font-medium">{title}</h2>
         {desc && <p className="mt-1 text-[13px] leading-relaxed text-fg-muted">{desc}</p>}
@@ -28,7 +28,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="mb-8 text-[28px] font-semibold tracking-tight">Settings</h1>
+      <h1 className="display mb-12 text-[44px] sm:text-[52px]">Settings</h1>
 
       <Row title="WhatsApp" desc="Where alerts are sent.">
         <PhoneSection phone={user.phone?.e164} />
@@ -41,10 +41,10 @@ export default async function SettingsPage() {
       <SettingsExtra user={user} />
 
       <Row title="Sources" desc="Checked automatically every few minutes.">
-        <ul className="divide-y divide-border rounded-xl border border-border text-[14px]">
-          {states.length === 0 && <li className="px-4 py-3 text-fg-muted">First check hasn&apos;t finished yet.</li>}
+        <ul className="divide-y divide-border border-y border-border text-[14px]">
+          {states.length === 0 && <li className="py-3 text-fg-muted">First check hasn&apos;t finished yet.</li>}
           {states.map((s) => (
-            <li key={s._id} className="flex items-center justify-between gap-4 px-4 py-3">
+            <li key={s._id} className="flex items-center justify-between gap-4 py-3">
               <span className="flex items-center gap-2">
                 <span className={`size-1.5 rounded-full ${s.lastError ? "bg-warn" : "bg-accent"}`} />
                 {s.name}

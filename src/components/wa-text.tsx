@@ -24,10 +24,10 @@ function renderLine(line: string) {
     if (m.index > last) out.push(line.slice(last, m.index));
     const t = m[0];
     if (t.startsWith("*")) out.push(<strong key={k++} className="font-semibold">{t.slice(1, -1)}</strong>);
-    else if (t.startsWith("_")) out.push(<em key={k++} className="opacity-70">{t.slice(1, -1)}</em>);
+    else if (t.startsWith("_")) out.push(<em key={k++} className="opacity-75">{t.slice(1, -1)}</em>);
     else
       out.push(
-        <a key={k++} href={t} target="_blank" rel="noopener noreferrer nofollow" className="break-all text-[#027eb5] underline-offset-2 hover:underline dark:text-[#53bdeb]">
+        <a key={k++} href={t} target="_blank" rel="noopener noreferrer nofollow" className="break-all text-[#027eb5] hover:underline dark:text-[#53bdeb]">
           {t.replace(/^https?:\/\//, "")}
         </a>,
       );
