@@ -102,7 +102,7 @@ export function api<C = unknown>(handler: Handler<C>) {
 
 export async function readJson<T = unknown>(req: Request): Promise<T> {
   const text = await req.text();
-  if (text.length > 20_000) throw new HttpError(413, "Too large");
+  if (text.length > 250_000) throw new HttpError(413, "Too large");
   try {
     return (text ? JSON.parse(text) : {}) as T;
   } catch {

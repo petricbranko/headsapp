@@ -1,27 +1,46 @@
 import { requireUser } from "@/lib/auth";
 import { Logo } from "@/components/logo";
-import { planLabel } from "@/edition";
+import { Icon } from "@/components/icons";
+import SidebarExtra from "@/edition/sidebar-extra";
 import { NavLinks } from "./nav-links";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
-  const plan = planLabel(user);
+  const initial = (user.name || user.email || "?").slice(0, 1).toUpperCase();
   return (
-    <div className="min-h-dvh">
-      <header className="sticky top-0 z-20 bg-bg/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-5xl items-center gap-4 px-5 sm:gap-8">
+    <div className="min-h-dvh bg-bg">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[256px] flex-col border-r border-border bg-bg-subtle px-3 py-4 lg:flex">
+        <div className="px-2.5 pb-6 pt-1">
           <Logo href="/dashboard" />
-          <NavLinks />
-          <div className="ml-auto flex items-center gap-3">
-            {plan && <span className="rounded-full bg-bg-muted px-2.5 py-0.5 text-[12px] font-medium text-fg-muted">{plan}</span>}
-            <span className="hidden max-w-[180px] truncate text-[13px] text-fg-subtle md:inline">{user.email}</span>
-            <a href="/logout" className="hidden text-[13px] text-fg-subtle hover:text-fg sm:inline">
-              Log out
+        </div>
+        <NavLinks />
+        <div className="mt-auto space-y-3">
+          <SidebarExtra user={user} />
+          <div className="flex items-center gap-2.5 rounded-lg px-2.5 py-2">
+            <span className="grid size-7 place-items-center rounded-full bg-bg-muted text-[12px] font-semibold text-fg-muted">{initial}</span>
+            <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted" title={user.email}>
+              {user.email}
+            </span>
+            <a href="/logout" className="grid size-7 place-items-center rounded-md text-fg-subtle hover:bg-bg-hover hover:text-fg" title="Log out" aria-label="Log out">
+              <Icon name="logout" />
             </a>
           </div>
         </div>
+      </aside>
+
+      <header className="sticky top-0 z-20 border-b border-border bg-bg/90 px-5 py-3 backdrop-blur lg:hidden">
+        <div className="mb-2 flex items-center justify-between">
+          <Logo href="/dashboard" />
+          <a href="/logout" className="text-[13px] text-fg-muted">
+            Log out
+          </a>
+        </div>
+        <NavLinks variant="top" />
       </header>
-      <main className="mx-auto max-w-5xl px-5 pb-28 pt-10 sm:pt-14">{children}</main>
+
+      <div className="lg:pl-[256px]">
+        <main className="px-5 py-8 sm:px-8 lg:px-14 lg:py-12">{children}</main>
+      </div>
     </div>
   );
 }

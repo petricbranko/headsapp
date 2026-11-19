@@ -94,11 +94,15 @@ export async function runIngest(): Promise<IngestSummary> {
   const startedAt = new Date();
   const result = await withLock("ingest", 10 * 60 * 1000, async () => {
     const pkgs = await watchedPackages();
+    const { users } = await cols();
+    const customNames = ((await users.distinct("stack.key")) as (string | null)[])
+      .filter((k): k is string => typeof k === "string" && k.startsWith("custom:"))
+      .map((k) => k.slice(7));
     const results = await Promise.all([
       runSource("ghsa", "GitHub Security Advisories", () => fetchGhsa(pkgs)),
       runSource("kev", "CISA Known Exploited Vulnerabilities", fetchKev),
       runSource("status", "Vendor status pages", fetchStatusPages),
-      runSource("news", "Security news", fetchNews),
+      runSource("news", "Security news", () => fetchNews(customNames)),
     ]);
     const fresh = await store(results.flatMap((r) => r.incidents));
     let alertsSent = 0;

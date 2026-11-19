@@ -2,26 +2,45 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon } from "@/components/icons";
 
-const LINKS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/stack", label: "Stack" },
-  { href: "/settings", label: "Settings" },
-];
+export const NAV = [
+  { href: "/dashboard", label: "Overview", icon: "overview" },
+  { href: "/incidents", label: "Incidents", icon: "incidents" },
+  { href: "/stack", label: "Stack", icon: "stack" },
+  { href: "/alerts", label: "Alerts", icon: "alerts" },
+  { href: "/settings", label: "Settings", icon: "settings" },
+] as const;
 
-export function NavLinks() {
+export function NavLinks({ variant = "sidebar" }: { variant?: "sidebar" | "top" }) {
   const path = usePathname();
+  if (variant === "top")
+    return (
+      <nav className="-mx-1 flex gap-1 overflow-x-auto px-1">
+        {NAV.map((l) => (
+          <Link key={l.href} href={l.href} className={`shrink-0 rounded-lg px-3 py-1.5 text-[13px] font-medium ${path.startsWith(l.href) ? "bg-bg-muted text-fg" : "text-fg-muted"}`}>
+            {l.label}
+          </Link>
+        ))}
+      </nav>
+    );
   return (
-    <nav className="flex items-center gap-1 sm:gap-3">
-      {LINKS.map((l) => (
-        <Link
-          key={l.href}
-          href={l.href}
-          className={`px-1.5 py-1.5 text-[14px] transition-colors sm:px-2 ${path.startsWith(l.href) ? "text-fg" : "text-fg-subtle hover:text-fg"}`}
-        >
-          {l.label}
-        </Link>
-      ))}
+    <nav className="space-y-0.5">
+      {NAV.map((l) => {
+        const active = path.startsWith(l.href);
+        return (
+          <Link
+            key={l.href}
+            href={l.href}
+            className={`flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[14px] transition-colors ${active ? "bg-bg text-fg shadow-[var(--shadow-xs),inset_0_0_0_1px_var(--border)] font-medium" : "text-fg-muted hover:bg-bg-hover hover:text-fg"}`}
+          >
+            <span className={active ? "text-accent" : "text-fg-subtle"}>
+              <Icon name={l.icon} />
+            </span>
+            {l.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

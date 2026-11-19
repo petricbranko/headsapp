@@ -2,7 +2,7 @@ import { CATALOG, vendorKey, npmKey, type CatalogEntry } from "../catalog";
 import { escapeRe } from "../text";
 
 /** Headline words that signal a vendor itself was hit (used for `strict` vendors). */
-const BREACH_RE = /\b(breach(ed|es)?|hacked|compromis(e|ed|es)|leak(ed|s)?|exposed|stolen|unauthori[sz]ed|vulnerabilit(y|ies)|flaw|zero-day|0-day|CVE-\d{4}-\d+|exploit(ed|s)?|backdoor(ed)?|supply[- ]chain|hijack(ed)?|ransomware|data theft)\b/i;
+export const BREACH_RE = /\b(breach(ed|es)?|hacked|compromis(e|ed|es)|leak(ed|s)?|exposed|stolen|unauthori[sz]ed|vulnerabilit(y|ies)|flaw|zero-day|0-day|CVE-\d{4}-\d+|exploit(ed|s)?|backdoor(ed)?|supply[- ]chain|hijack(ed)?|ransomware|data theft)\b/i;
 
 /** Any security signal at all (news sources are security-focused, so this is a sanity check). */
 export const SECURITY_RE = /\b(security|breach|hack|compromis|leak|exposed|stolen|unauthori[sz]ed|vulnerab|flaw|zero-day|CVE-|exploit|malware|malicious|backdoor|phish|ransomware|attack|credential|patch|supply[- ]chain|hijack)/i;
@@ -36,6 +36,12 @@ export function matchHeadline(title: string): string[] {
     keys.push(vendorKey(entry.slug));
   }
   return keys;
+}
+
+/** Custom (user-typed) tools: exact name in the headline AND breach language, to stay quiet. */
+export function matchCustom(title: string, names: string[]): string[] {
+  if (!names.length || !BREACH_RE.test(title)) return [];
+  return names.filter((n) => new RegExp(`(?<![\\w.-])${escapeRe(n)}(?![\\w-])`, "i").test(title)).map((n) => `custom:${n}`);
 }
 
 export function matchKev(vendorProject: string, product: string): string[] {

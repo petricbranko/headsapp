@@ -2,18 +2,23 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { StackPicker } from "@/components/stack-picker";
+import { StackBuilder, SelectedStack } from "@/components/stack-builder";
 import { call } from "@/components/api";
 
-export function StackEditor({ initial, max }: { initial: string[]; max: number }) {
+export function StackEditor({ initial, max, limitHint }: { initial: string[]; max: number; limitHint?: string }) {
   const router = useRouter();
   const [keys, setKeys] = useState(initial);
-  const [saved, setSaved] = useState(initial);
+  const saved = useRef(initial);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   function change(next: string[]) {
+    if (next.length > max) {
+      setError(limitHint ?? `You can monitor up to ${max} tools.`);
+      setStatus("error");
+      return;
+    }
     setKeys(next);
     setError(null);
     clearTimeout(timer.current);
@@ -21,28 +26,36 @@ export function StackEditor({ initial, max }: { initial: string[]; max: number }
       setStatus("saving");
       try {
         await call("/api/stack", "PUT", { keys: next });
-        setSaved(next);
+        saved.current = next;
         setStatus("saved");
         router.refresh();
       } catch (e) {
         setError((e as Error).message);
-        setKeys(saved);
+        setKeys(saved.current);
         setStatus("error");
       }
-    }, 500);
+    }, 400);
   }
 
   return (
-    <div>
-      <div className="mb-5 flex h-5 items-center justify-between text-[13px]">
-        <span className="text-fg-muted">
-          {keys.length} watched{max < 500 ? ` of ${max}` : ""}
-        </span>
-        <span className={status === "error" ? "text-danger" : "text-fg-subtle"}>
-          {status === "saving" ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? error : ""}
-        </span>
+    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0">
+        <StackBuilder value={keys} onChange={change} />
       </div>
-      <StackPicker value={keys} onChange={change} />
+      <aside className="h-fit xl:sticky xl:top-8">
+        <div className="card overflow-hidden">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
+            <div className="text-[14px] font-semibold">
+              Your stack <span className="font-normal text-fg-subtle">· {keys.length}{max < 500 ? ` of ${max}` : ""}</span>
+            </div>
+            <span className={`text-[12px] ${status === "error" ? "text-danger" : "text-fg-subtle"}`}>{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : ""}</span>
+          </div>
+          <div className="max-h-[60vh] overflow-y-auto p-2">
+            <SelectedStack value={keys} onRemove={(k) => change(keys.filter((x) => x !== k))} empty="Pick tools on the left to start monitoring." />
+          </div>
+          {error && <div className="border-t border-border px-4 py-3 text-[13px] text-danger">{error}</div>}
+        </div>
+      </aside>
     </div>
   );
 }

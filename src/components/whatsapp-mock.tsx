@@ -149,3 +149,16 @@ export function PhoneMock({ messages, className = "" }: { messages: MockMessage[
     </div>
   );
 }
+
+/** One message on WhatsApp wallpaper, for compact previews in the app. */
+export function WhatsAppBubble({ body, time }: { body: string; time: string }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-border font-system">
+      <Wallpaper className="px-3.5 py-4">
+        <div className="pl-1.5">
+          <Bubble m={{ body, time }} first />
+        </div>
+      </Wallpaper>
+    </div>
+  );
+}

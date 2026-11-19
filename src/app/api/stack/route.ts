@@ -2,7 +2,7 @@ import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { api, readJson, HttpError } from "@/lib/auth";
 import { cols } from "@/lib/db";
-import { catalogEntry, isValidNpmName } from "@/lib/catalog";
+import { catalogEntry, isValidNpmName, isValidCustomName } from "@/lib/catalog";
 import { stackLimit } from "@/edition";
 import type { StackItem } from "@/lib/types";
 import { backfillPackages } from "@/lib/ingest";
@@ -10,7 +10,7 @@ import { fetchText } from "@/lib/sources/http";
 
 const Body = z.object({ keys: z.array(z.string().max(240)).max(500) });
 
-async function npmExists(name: string) {
+export async function npmExists(name: string) {
   try {
     await fetchText(`https://registry.npmjs.org/${name.replace("/", "%2F")}`, { method: "HEAD", timeoutMs: 5000 } as RequestInit);
     return true;
@@ -39,6 +39,10 @@ export const PUT = api(async ({ req, user }) => {
       if (!isValidNpmName(name)) throw new HttpError(400, `Invalid npm package name: ${name}`);
       if (!(await npmExists(name))) throw new HttpError(400, `Couldn't find "${name}" on npm`);
       items.push({ key, kind: "npm", name, addedAt: new Date() });
+    } else if (key.startsWith("custom:")) {
+      const name = key.slice(7).trim();
+      if (!isValidCustomName(name)) throw new HttpError(400, `Invalid name: ${name.slice(0, 40)}`);
+      items.push({ key: `custom:${name}`, kind: "custom", name, addedAt: new Date() });
     } else throw new HttpError(400, "Invalid item");
   }
   const { max, upgradeHint } = await stackLimit(user);

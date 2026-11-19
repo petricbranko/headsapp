@@ -161,11 +161,34 @@ export function npmKey(name: string) {
   return `npm:${name}`;
 }
 
+export function customKey(name: string) {
+  return `custom:${name}`;
+}
+
 /** Human label for a stack key. */
 export function labelForKey(key: string): string {
   if (key.startsWith("vendor:")) return catalogEntry(key.slice(7))?.name ?? key.slice(7);
   if (key.startsWith("npm:")) return key.slice(4);
+  if (key.startsWith("custom:")) return key.slice(7);
   return key;
+}
+
+/** Custom tool names: letters, digits, spaces and a few separators, 2-60 chars. */
+export const CUSTOM_NAME_RE = /^[\p{L}\p{N}][\p{L}\p{N} .&+\-]{1,59}$/u;
+export function isValidCustomName(name: string) {
+  return CUSTOM_NAME_RE.test(name.trim());
+}
+
+/** Find a catalog entry by a loosely written name ("next", "NextJS", "Supabase", "@supabase/supabase-js"). */
+export function findCatalogMatch(raw: string): CatalogEntry | undefined {
+  const norm = (x: string) => x.toLowerCase().replace(/\.js$|js$/i, "").replace(/[^a-z0-9]/g, "");
+  const n = norm(raw);
+  if (!n) return undefined;
+  return (
+    CATALOG.find((e) => norm(e.name) === n || norm(e.slug) === n) ??
+    CATALOG.find((e) => e.npm?.includes(raw.trim().toLowerCase())) ??
+    CATALOG.find((e) => e.name.split(/[\s/]+/).some((w) => norm(w) === n && n.length > 3))
+  );
 }
 
 // npm naming rules (simplified, strict): optional scope, lowercase, url-safe.
@@ -189,4 +212,8 @@ export function searchCatalog(q: string, limit = 12): CatalogEntry[] {
   }).filter((x) => x.score > 0);
   scored.sort((a, b) => b.score - a.score || a.e.name.localeCompare(b.e.name));
   return scored.slice(0, limit).map((x) => x.e);
+}
+
+export function escapeRegexForSearch(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

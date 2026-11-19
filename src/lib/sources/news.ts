@@ -1,7 +1,7 @@
 import "server-only";
 import { XMLParser } from "fast-xml-parser";
 import { fetchText, pool } from "./http";
-import { matchHeadline, SECURITY_RE } from "./match";
+import { matchHeadline, matchCustom, SECURITY_RE } from "./match";
 import type { RawIncident, SourceResult } from "./types";
 import { labelForKey } from "../catalog";
 import { stripHtml, truncate } from "../text";
@@ -62,7 +62,7 @@ const CVE_RE = /CVE-\d{4}-\d{4,}/g;
 const ROUNDUP_RE = /\b(weekly recap|week in review|threatsday|this week in|roundup|\+\s?\d+ more stories|newsletter|podcast|webinar)\b/i;
 
 /** Security news. Only headlines that name a tool in the catalog are kept. */
-export async function fetchNews(): Promise<SourceResult> {
+export async function fetchNews(customNames: string[] = []): Promise<SourceResult> {
   const incidents: RawIncident[] = [];
   const results = await pool(NEWS_FEEDS, 5, async (f) => ({ f, items: parseFeed(await fetchText(f.url)) }));
   const failed = results.filter((r) => r.status === "rejected");
@@ -75,7 +75,7 @@ export async function fetchNews(): Promise<SourceResult> {
       if (!it.title || !/^https:\/\//.test(it.link)) continue;
       if (Number.isNaN(it.date.getTime()) || it.date.getTime() < since) continue;
       if (ROUNDUP_RE.test(it.title)) continue;
-      const targets = matchHeadline(it.title);
+      const targets = [...matchHeadline(it.title), ...matchCustom(it.title, customNames)];
       if (!targets.length) continue;
       if (!SECURITY_RE.test(`${it.title} ${it.description}`)) continue;
       const name = labelForKey(targets[0]);

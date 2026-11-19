@@ -1,54 +1,38 @@
 @import "tailwindcss";
 
-/* Warm, paper-like neutrals. One accent (deep green), used only for live/status signals. */
-:root {
-  --bg: #fbfaf7;
-  --bg-raised: #ffffff;
-  --bg-subtle: #f5f3ee;
-  --bg-muted: #efede6;
-  --fg: #1b1b19;
-  --fg-muted: #66655f;
-  --fg-subtle: #9a9890;
-  --border: #e8e5dd;
-  --border-strong: #d9d5ca;
-  --accent: #1d6b45;
-  --accent-hover: #175a39;
-  --accent-fg: #ffffff;
-  --accent-soft: #e8f0ea;
-  --accent-ring: rgb(29 107 69 / 0.16);
-  --danger: #b4321f;
-  --warn: #b86a12;
-  --sev-critical: #d23a24;
-  --sev-high: #e07b1f;
-  --sev-medium: #d6a820;
-  --shadow-soft: 0 1px 2px rgb(27 27 25 / 0.04), 0 8px 24px -12px rgb(27 27 25 / 0.08);
-}
+/* Light only: `dark:` utilities never apply, regardless of the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121211;
-    --bg-raised: #191918;
-    --bg-subtle: #171716;
-    --bg-muted: #1f1f1d;
-    --fg: #f0eee8;
-    --fg-muted: #a3a199;
-    --fg-subtle: #6f6d66;
-    --border: #262624;
-    --border-strong: #33322f;
-    --accent: #4fb782;
-    --accent-hover: #6cc898;
-    --accent-fg: #0b1f14;
-    --accent-soft: #15271d;
-    --accent-ring: rgb(79 183 130 / 0.22);
-    --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
-  }
+/* Light theme only. Neutral grays, one green accent for primary actions and "live" signals. */
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-subtle: #f9f9fa;
+  --bg-muted: #f3f3f5;
+  --bg-hover: #f5f5f7;
+  --fg: #0c0c0f;
+  --fg-muted: #5b5b68;
+  --fg-subtle: #8b8b98;
+  --border: #ebebef;
+  --border-strong: #dcdce2;
+  --accent: #0f9d58;
+  --accent-hover: #0b8a4c;
+  --accent-fg: #ffffff;
+  --accent-soft: #eaf7f0;
+  --accent-text: #0a7a43;
+  --accent-ring: rgb(15 157 88 / 0.18);
+  --danger: #d9342b;
+  --sev-critical: #e5484d;
+  --sev-high: #f76b15;
+  --sev-medium: #f5b400;
+  --sev-low: #8b8b98;
 }
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-bg-raised: var(--bg-raised);
   --color-bg-subtle: var(--bg-subtle);
   --color-bg-muted: var(--bg-muted);
+  --color-bg-hover: var(--bg-hover);
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-fg-subtle: var(--fg-subtle);
@@ -58,12 +42,14 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
   --color-danger: var(--danger);
-  --color-warn: var(--warn);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
   --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
+  --shadow-xs: 0 1px 2px rgb(12 12 15 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(12 12 15 / 0.04), 0 2px 6px rgb(12 12 15 / 0.04);
+  --shadow-lg: 0 1px 2px rgb(12 12 15 / 0.04), 0 12px 32px -8px rgb(12 12 15 / 0.12);
 }
 
 html {
@@ -75,9 +61,9 @@ html {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-feature-settings: "cv11", "ss01", "ss03";
-  font-size: 15px;
-  line-height: 1.55;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 ::selection {
@@ -85,61 +71,62 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--fg);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 8px;
 }
 
-/* Display type: editorial serif, normal weight, tight. */
-@utility display {
-  font-family: var(--font-serif);
-  font-weight: 400;
-  letter-spacing: -0.022em;
-  line-height: 1;
-  font-optical-sizing: auto;
+/* Headings: Inter, tight tracking (like Inter Display). */
+@utility heading {
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
 }
 
 @utility btn {
-  @apply inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-[14px] font-medium tracking-[-0.005em] transition-[background-color,opacity,box-shadow] duration-150 disabled:cursor-not-allowed disabled:opacity-40 select-none whitespace-nowrap;
+  @apply inline-flex h-9 items-center justify-center gap-2 rounded-lg px-4 text-[14px] font-medium transition-[background-color,box-shadow,color,opacity] duration-150 disabled:cursor-not-allowed disabled:opacity-45 select-none whitespace-nowrap;
 }
 @utility btn-primary {
-  @apply btn bg-fg text-bg hover:opacity-85;
+  @apply btn bg-accent text-accent-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.15),0_1px_2px_rgb(12_12_15/0.1)] hover:bg-accent-hover;
 }
-@utility btn-accent {
-  @apply btn bg-accent text-accent-fg hover:bg-accent-hover;
+@utility btn-dark {
+  @apply btn bg-fg text-white hover:bg-[#26262c];
+}
+@utility btn-secondary {
+  @apply btn bg-bg text-fg shadow-[inset_0_0_0_1px_var(--border-strong),var(--shadow-xs)] hover:bg-bg-hover;
 }
 @utility btn-ghost {
-  @apply btn bg-bg-raised text-fg shadow-[inset_0_0_0_1px_var(--border-strong)] hover:bg-bg-subtle;
+  @apply btn text-fg-muted hover:bg-bg-hover hover:text-fg;
+}
+@utility btn-lg {
+  @apply h-11 px-5 text-[15px];
 }
 @utility btn-sm {
-  @apply h-8 px-3.5 text-[13px];
+  @apply h-8 px-3 text-[13px];
 }
 @utility input {
-  @apply h-11 w-full rounded-xl border border-border-strong bg-bg-raised px-4 text-[15px] text-fg placeholder:text-fg-subtle outline-none transition focus:border-fg focus:ring-4 focus:ring-[color-mix(in_srgb,var(--fg)_8%,transparent)];
+  @apply h-10 w-full rounded-lg border border-border-strong bg-bg px-3.5 text-[14px] text-fg shadow-[var(--shadow-xs)] placeholder:text-fg-subtle outline-none transition focus:border-accent focus:ring-[3px] focus:ring-[var(--accent-ring)];
 }
 @utility card {
-  @apply rounded-2xl border border-border bg-bg-raised;
+  @apply rounded-xl border border-border bg-bg shadow-[var(--shadow-xs)];
 }
-@utility label {
-  @apply text-[13px] font-medium text-fg-muted;
-}
-@utility eyebrow {
-  @apply text-[13px] font-medium text-fg-subtle;
+@utility kicker {
+  @apply text-[13px] font-medium text-accent-text;
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
 .animate-in {
-  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @keyframes live {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  0% { box-shadow: 0 0 0 0 rgb(15 157 88 / 0.35); }
+  70% { box-shadow: 0 0 0 6px rgb(15 157 88 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(15 157 88 / 0); }
 }
 .pulse-dot {
-  animation: live 2.4s ease-in-out infinite;
+  animation: live 2s ease-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .animate-in, .pulse-dot { animation: none; }

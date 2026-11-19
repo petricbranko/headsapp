@@ -3,9 +3,9 @@ import type { ObjectId } from "mongodb";
 export type Severity = "critical" | "high" | "medium" | "low";
 export const SEVERITY_RANK: Record<Severity, number> = { critical: 4, high: 3, medium: 2, low: 1 };
 
-export type StackKind = "vendor" | "npm";
+export type StackKind = "vendor" | "npm" | "custom";
 export interface StackItem {
-  key: string; // "vendor:vercel" | "npm:lodash"
+  key: string; // "vendor:vercel" | "npm:lodash" | "custom:Acme Pay"
   kind: StackKind;
   name: string;
   addedAt: Date;
