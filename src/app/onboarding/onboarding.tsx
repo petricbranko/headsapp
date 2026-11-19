@@ -19,8 +19,12 @@ interface SentMessage {
   createdAt: string;
 }
 
-function Progress({ step, paid }: { step: Step; paid: boolean }) {
-  const order: Step[] = paid ? [0, "pay", 1, 2] : [0, 1, 2];
+function stepOrder(withSubscribe: boolean): Step[] {
+  return withSubscribe ? [0, "pay", 1, 2] : [0, 1, 2];
+}
+
+function Progress({ step, withSubscribe }: { step: Step; withSubscribe: boolean }) {
+  const order = stepOrder(withSubscribe);
   const labels: Record<string, string> = { "0": "Your stack", pay: "Subscribe", "1": "WhatsApp", "2": "Done" };
   const STEPS = order.map((o) => labels[String(o)]);
   const idx = order.indexOf(step);
@@ -44,6 +48,7 @@ function Progress({ step, paid }: { step: Step; paid: boolean }) {
 }
 
 export function Onboarding({
+  withSubscribe = false,
   initialStep = 0,
   paywall,
   initialStack,
@@ -53,6 +58,7 @@ export function Onboarding({
   max,
   limitHint,
 }: {
+  withSubscribe?: boolean;
   initialStep?: Step;
   paywall: Paywall | null;
   initialStack: string[];
@@ -64,7 +70,9 @@ export function Onboarding({
 }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
-  const total = paywall ? 4 : 3;
+  const order = stepOrder(withSubscribe);
+  const total = order.length;
+  const stepNo = (s: Step) => order.indexOf(s) + 1;
   const [keys, setKeys] = useState<string[]>(initialStack);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,23 +109,17 @@ export function Onboarding({
     <div className="flex min-h-dvh flex-col bg-bg">
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-border px-6 lg:px-10">
         <Logo href="/dashboard" />
-        <Progress step={step} paid={Boolean(paywall)} />
-        {paywall ? (
-          <a href="/logout" className="text-[13px] text-fg-muted hover:text-fg">
-            Log out
-          </a>
-        ) : (
-          <button className="text-[13px] text-fg-muted hover:text-fg" onClick={finish}>
-            Skip setup
-          </button>
-        )}
+        <Progress step={step} withSubscribe={withSubscribe} />
+        <a href="/logout" className="text-[13px] text-fg-muted hover:text-fg">
+          Log out
+        </a>
       </header>
 
       {step === 0 && (
         <div className="grid flex-1 lg:grid-cols-[minmax(0,1fr)_380px]">
           <main className="min-w-0 px-6 py-10 lg:px-12 lg:py-14">
             <div className="animate-in">
-              <div className="kicker">Step 1 of {total}</div>
+              <div className="kicker">Step {stepNo(0)} of {total}</div>
               <h1 className="heading mt-2 text-[32px] sm:text-[36px]">What&apos;s in your stack?</h1>
               <p className="mt-3 max-w-[640px] text-[15px] leading-relaxed text-fg-muted">
                 Add the services and packages you depend on. Pick from the list, paste or import your own, or let your coding agent write the list for you.
@@ -136,7 +138,22 @@ export function Onboarding({
               </div>
             </div>
             <div className="min-h-[120px] flex-1 overflow-y-auto px-4">
-              <SelectedStack value={keys} max={max} onRemove={(k) => setKeys(keys.filter((x) => x !== k))} empty="Nothing yet. Pick a few tools to start." />
+              {keys.length ? (
+                <SelectedStack value={keys} max={max} onRemove={(k) => setKeys(keys.filter((x) => x !== k))} />
+              ) : (
+                <div className="px-2 pt-2 text-[13.5px] leading-relaxed text-fg-muted">
+                  <p>Add everything your product depends on:</p>
+                  <ul className="mt-3 space-y-2">
+                    {["Where it's hosted (Vercel, AWS…)", "Your database and auth", "Payments and email providers", "Key npm packages"].map((t) => (
+                      <li key={t} className="flex gap-2">
+                        <span className="mt-[7px] size-1 shrink-0 rounded-full bg-fg-subtle" />
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 text-fg-subtle">Most stacks have 6 to 15 items. You can change this anytime.</p>
+                </div>
+              )}
             </div>
             <div className="space-y-3 border-t border-border bg-bg-subtle p-6">
               {overLimit && <p className="text-[13px] leading-relaxed text-fg-muted">{limitHint ?? `You can monitor up to ${max} tools.`}</p>}
@@ -154,7 +171,7 @@ export function Onboarding({
       {step === 1 && (
         <main className="flex flex-1 items-start justify-center px-6 py-16 sm:py-24">
           <div className="w-full max-w-[460px] animate-in">
-            <div className="kicker">Step {total - 1} of {total}</div>
+            <div className="kicker">Step {stepNo(1)} of {total}</div>
             <h1 className="heading mt-2 text-[32px]">Where should we send alerts?</h1>
             <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">Your WhatsApp number. We&apos;ll verify it and send a test alert right away.</p>
             <div className="mt-8">
@@ -168,9 +185,14 @@ export function Onboarding({
                 }}
               />
             </div>
-            <button className="mt-8 text-[13px] text-fg-muted hover:text-fg" onClick={() => setStep(0)}>
-              ← Back to stack
-            </button>
+            <div className="mt-8 flex items-center justify-between text-[13px]">
+              <button className="text-fg-muted hover:text-fg" onClick={() => setStep(0)}>
+                ← Back to stack
+              </button>
+              <button className="text-fg-muted hover:text-fg" onClick={finish}>
+                Set up WhatsApp later
+              </button>
+            </div>
           </div>
         </main>
       )}

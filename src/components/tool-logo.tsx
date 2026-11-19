@@ -1,8 +1,14 @@
 import { LOGOS } from "@/lib/logos.generated";
 
-function monogram(name: string) {
-  const words = name.replace(/[^A-Za-z0-9 ]/g, " ").trim().split(/\s+/);
-  return (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2)).toUpperCase();
+/* Brands without a public logo get a clean letter tile in a stable, muted colour. */
+const TILE = [
+  ["#eef0ff", "#4b4fc4"], ["#e8f5ee", "#1f7a4d"], ["#fdf0e6", "#b05a17"], ["#f1ecfb", "#6b45b5"],
+  ["#e7f3f8", "#1f6f8b"], ["#fbeaf0", "#a83a64"], ["#f2f2f4", "#4b4b57"],
+];
+function tile(name: string) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return TILE[h % TILE.length];
 }
 
 /** Brand logo tile for a stack key ("vendor:vercel", "npm:axios", "custom:Acme"). */
@@ -12,7 +18,7 @@ export function ToolLogo({ stackKey, name, size = 32 }: { stackKey: string; name
   const inner = Math.round(size * 0.55);
   return (
     <span
-      className="grid shrink-0 place-items-center rounded-[9px] border border-border bg-bg shadow-[var(--shadow-xs)]"
+      className="grid shrink-0 place-items-center overflow-hidden rounded-[9px] border border-border bg-bg shadow-[var(--shadow-xs)]"
       style={{ width: size, height: size, borderRadius: Math.max(6, size * 0.28) }}
       aria-hidden="true"
     >
@@ -25,8 +31,8 @@ export function ToolLogo({ stackKey, name, size = 32 }: { stackKey: string; name
           <path fill="#CB3837" d={LOGOS["npm-registry"]?.path ?? ""} />
         </svg>
       ) : (
-        <span className="text-[11px] font-semibold tracking-tight text-fg-muted" style={{ fontSize: Math.max(9, size * 0.32) }}>
-          {monogram(name)}
+        <span className="grid h-full w-full place-items-center font-semibold" style={{ background: tile(name)[0], color: tile(name)[1], fontSize: Math.max(10, size * 0.42), borderRadius: "inherit" }}>
+          {name.replace(/[^A-Za-z0-9]/g, "").charAt(0).toUpperCase() || "?"}
         </span>
       )}
     </span>

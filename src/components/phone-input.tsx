@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AsYouType, getCountries, getCountryCallingCode, type CountryCode } from "libphonenumber-js";
+import { AsYouType, getCountries, getCountryCallingCode, parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js";
 
 interface Country {
   code: CountryCode;
@@ -17,6 +17,21 @@ function countries(): Country[] {
     .map((code) => ({ code, name: names.of(code) ?? code, dial: getCountryCallingCode(code) }))
     .sort((a, b) => a.name.localeCompare(b.name));
   return cache;
+}
+
+/** Country to show for a calling code shared by several countries (+1, +44, +7...). */
+const MAIN: Record<string, CountryCode> = { "1": "US", "7": "RU", "44": "GB", "47": "NO", "61": "AU", "212": "MA", "262": "RE", "290": "SH", "358": "FI", "590": "GP", "599": "CW" };
+
+function countryForInternational(raw: string): { country: CountryCode; national: string } | null {
+  const t = new AsYouType();
+  t.input(raw);
+  const code = t.getCallingCode();
+  if (!code) return null;
+  const parsed = parsePhoneNumberFromString(raw);
+  const country =
+    (parsed?.isValid() ? parsed.country : undefined) ?? t.getCountry() ?? MAIN[code] ?? getCountries().find((c) => getCountryCallingCode(c) === code);
+  if (!country) return null;
+  return { country, national: t.getNationalNumber() };
 }
 
 export function guessCountry(): CountryCode {
@@ -107,17 +122,13 @@ export function PhoneInput({
           autoFocus={autoFocus}
           onChange={(e) => {
             const raw = e.target.value;
-            // Pasting a full international number switches the country automatically.
+            // Typing or pasting "+<code>…" moves the code into the country picker as soon as it's known.
             if (raw.trim().startsWith("+")) {
-              const t = new AsYouType();
-              const formatted = t.input(raw);
-              const c = t.getCountry();
-              if (c) {
-                onCountry(c);
-                onChange(new AsYouType(c).input(t.getNationalNumber()));
-                return;
-              }
-              onChange(formatted);
+              const hit = countryForInternational(raw.trim());
+              if (hit) {
+                onCountry(hit.country);
+                onChange(hit.national ? new AsYouType(hit.country).input(hit.national) : "");
+              } else onChange(raw);
               return;
             }
             onChange(new AsYouType(country).input(raw));

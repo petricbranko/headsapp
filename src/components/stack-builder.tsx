@@ -128,15 +128,22 @@ function Browse({ selected, toggle, add }: { selected: Set<string>; toggle: (k: 
 
       {!query && (
         <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
-          {(["Popular", ...CATEGORIES, "All"] as const).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCat(c)}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-[13px] transition-colors ${cat === c ? "bg-fg text-white" : "text-fg-muted hover:bg-bg-muted hover:text-fg"}`}
-            >
-              {c}
-            </button>
-          ))}
+          {(["Popular", ...CATEGORIES, "All"] as const).map((c) => {
+            const n = c === "Popular" || c === "All" ? 0 : CATALOG.filter((e) => e.category === c && selected.has(vendorKey(e.slug))).length;
+            return (
+              <button
+                key={c}
+                onClick={() => setCat(c)}
+                aria-pressed={cat === c}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] transition-colors ${cat === c ? "bg-fg text-white" : "text-fg-muted hover:bg-bg-muted hover:text-fg"}`}
+              >
+                {c}
+                {n > 0 && (
+                  <span className={`min-w-[18px] rounded-full px-1 text-center text-[11px] font-semibold tabular-nums ${cat === c ? "bg-white/20 text-white" : "bg-accent-soft text-accent-text"}`}>{n}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
 

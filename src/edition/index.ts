@@ -7,6 +7,8 @@ export const edition = {
   name: "HeadsApp",
   /** Path the logo links to when signed out. */
   homePath: "/login",
+  /** Whether onboarding includes a subscribe step (shown even after paying, so steps stay stable). */
+  billing: false as boolean,
 };
 
 /** Called before adding stack items. Return a message to block (e.g. plan limits). */

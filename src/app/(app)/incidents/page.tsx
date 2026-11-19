@@ -26,7 +26,7 @@ export default async function Incidents({ searchParams }: { searchParams: Promis
   const q = (sp.q ?? "").trim().slice(0, 80);
   const page = Math.max(1, Math.min(50, Number(sp.page) || 1));
 
-  const { incidents, alerts } = await cols();
+  const { incidents, alerts, states } = await cols();
   const filter: Filter<IncidentDoc> = { targets: tool ? tool : { $in: keys } };
   if (sev) filter.severity = sev;
   if (q) filter.title = { $regex: escapeRegexForSearch(q), $options: "i" };
@@ -35,6 +35,9 @@ export default async function Incidents({ searchParams }: { searchParams: Promis
     : [[], 0];
   const alerted = new Set(
     (await alerts.find({ userId: user._id, kind: "incident", incidentId: { $in: rows.map((r) => r._id!) }, status: { $in: ["sent", "logged"] } }, { projection: { incidentId: 1 } }).toArray()).map((a) => a.incidentId!.toString()),
+  );
+  const marks = new Map(
+    (await states.find({ userId: user._id, incidentId: { $in: rows.map((r) => r._id!) } }).toArray()).map((m) => [m.incidentId.toString(), m.state]),
   );
   const qs = (p: Record<string, string | undefined>) => {
     const u = new URLSearchParams();
@@ -82,7 +85,7 @@ export default async function Incidents({ searchParams }: { searchParams: Promis
               <th className="px-5 py-2.5 font-medium">Incident</th>
               <th className="hidden w-[220px] px-5 py-2.5 font-medium md:table-cell">Affects</th>
               <th className="w-[120px] px-5 py-2.5 font-medium">Severity</th>
-              <th className="hidden w-[110px] px-5 py-2.5 font-medium lg:table-cell">WhatsApp</th>
+              <th className="hidden w-[130px] px-5 py-2.5 font-medium lg:table-cell">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -105,7 +108,15 @@ export default async function Incidents({ searchParams }: { searchParams: Promis
                   <td className="px-5 py-3.5">
                     <SeverityBadge severity={inc.severity} />
                   </td>
-                  <td className="hidden px-5 py-3.5 text-[13px] lg:table-cell">{alerted.has(inc._id!.toString()) ? <span className="text-accent-text">Sent</span> : <span className="text-fg-subtle">—</span>}</td>
+                  <td className="hidden px-5 py-3.5 text-[13px] lg:table-cell">
+                    {marks.get(inc._id!.toString()) === "fixed" ? (
+                      <span className="text-accent-text">Fixed</span>
+                    ) : marks.get(inc._id!.toString()) === "not_affected" ? (
+                      <span className="text-fg-muted">Not affected</span>
+                    ) : (
+                      <span className="text-fg-subtle">Open{alerted.has(inc._id!.toString()) ? " · alerted" : ""}</span>
+                    )}
+                  </td>
                 </tr>
               );
             })}

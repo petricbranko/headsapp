@@ -1,7 +1,7 @@
 import "server-only";
 import { MongoClient, type Db, type Collection, ObjectId } from "mongodb";
 import { env } from "./env";
-import type { UserDoc, IncidentDoc, AlertDoc, MessageDoc, SourceStateDoc, RateDoc, LockDoc } from "./types";
+import type { UserDoc, IncidentDoc, AlertDoc, MessageDoc, SourceStateDoc, RateDoc, LockDoc, IncidentStateDoc } from "./types";
 
 type G = typeof globalThis & { __headsappMongo?: Promise<MongoClient>; __headsappIndexes?: Promise<void> };
 const g = globalThis as G;
@@ -34,6 +34,7 @@ export async function cols() {
     sources: d.collection<SourceStateDoc>("sources") as Collection<SourceStateDoc>,
     rates: d.collection<RateDoc>("rates") as Collection<RateDoc>,
     locks: d.collection<LockDoc>("locks") as Collection<LockDoc>,
+    states: d.collection<IncidentStateDoc>("incident_states") as Collection<IncidentStateDoc>,
   };
 }
 
@@ -48,6 +49,7 @@ async function ensureIndexes(d: Db) {
     d.collection("alerts").createIndex({ userId: 1, createdAt: -1 }),
     d.collection("messages").createIndex({ userId: 1, createdAt: -1 }),
     d.collection("rates").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+    d.collection("incident_states").createIndex({ userId: 1, incidentId: 1 }, { unique: true }),
     d.collection("locks").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
   ]);
 }

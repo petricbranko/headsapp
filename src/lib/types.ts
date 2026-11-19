@@ -86,6 +86,16 @@ export interface RateDoc {
   expiresAt: Date;
 }
 
+/** A user's own status for an incident: lets them close the loop ("I fixed it"). */
+export type IncidentState = "fixed" | "not_affected";
+export interface IncidentStateDoc {
+  _id?: ObjectId;
+  userId: ObjectId;
+  incidentId: ObjectId;
+  state: IncidentState;
+  updatedAt: Date;
+}
+
 export interface LockDoc {
   _id: string;
   expiresAt: Date;

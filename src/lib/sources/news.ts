@@ -73,6 +73,7 @@ export async function fetchNews(customNames: string[] = []): Promise<SourceResul
     const { f, items } = r.value;
     for (const it of items) {
       if (!it.title || !/^https:\/\//.test(it.link)) continue;
+      it.description = it.description.replace(/\s*\[(\.\.\.|…)\]\s*$/, "…").replace(/\s*The post .* appeared first on .*$/, "");
       if (Number.isNaN(it.date.getTime()) || it.date.getTime() < since) continue;
       if (ROUNDUP_RE.test(it.title)) continue;
       const targets = [...matchHeadline(it.title), ...matchCustom(it.title, customNames)];
