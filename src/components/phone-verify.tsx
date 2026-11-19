@@ -12,7 +12,7 @@ function guessCountry(): string | undefined {
   }
 }
 
-export function PhoneVerify({ onVerified, initialPhone, submitLabel = "Send code" }: { onVerified: (e164: string) => void; initialPhone?: string; submitLabel?: string }) {
+export function PhoneVerify({ onVerified, initialPhone, submitLabel = "Send code", autoFocus = true }: { onVerified: (e164: string) => void; initialPhone?: string; submitLabel?: string; autoFocus?: boolean }) {
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [phone, setPhone] = useState(initialPhone ?? "");
   const [e164, setE164] = useState("");
@@ -69,7 +69,7 @@ export function PhoneVerify({ onVerified, initialPhone, submitLabel = "Send code
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             aria-label="WhatsApp number"
-            autoFocus
+            autoFocus={autoFocus}
             required
           />
           <button className="btn-primary h-11 px-6" disabled={busy || phone.replace(/\D/g, "").length < 6}>

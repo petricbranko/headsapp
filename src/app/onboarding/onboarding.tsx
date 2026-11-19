@@ -17,7 +17,7 @@ interface SentMessage {
   createdAt: string;
 }
 
-export function Onboarding({ initialStack, hasPhone, phone, consoleMode }: { initialStack: string[]; hasPhone: boolean; phone?: string; consoleMode: boolean }) {
+export function Onboarding({ initialStack, hasPhone, phone, consoleMode, max, limitHint }: { initialStack: string[]; hasPhone: boolean; phone?: string; consoleMode: boolean; max: number; limitHint?: string }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(0);
   const [keys, setKeys] = useState<string[]>(initialStack);
@@ -25,6 +25,7 @@ export function Onboarding({ initialStack, hasPhone, phone, consoleMode }: { ini
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState<SentMessage | null>(null);
   const [to, setTo] = useState(phone);
+  const overLimit = keys.length > max;
 
   async function saveStack() {
     setBusy(true);
@@ -70,9 +71,14 @@ export function Onboarding({ initialStack, hasPhone, phone, consoleMode }: { ini
               <StackPicker value={keys} onChange={setKeys} />
             </div>
             {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+            {overLimit && (
+              <p className="mt-4 text-sm text-fg-muted">
+                {limitHint ?? `You can watch up to ${max} tools.`} Remove {keys.length - max} to continue.
+              </p>
+            )}
             <div className="sticky bottom-0 -mx-6 mt-10 bg-gradient-to-t from-bg via-bg to-transparent px-6 pb-4 pt-6">
-              <button className="btn-primary h-12 w-full text-[15px]" disabled={!keys.length || busy} onClick={saveStack}>
-                {busy ? "Saving…" : keys.length ? `Watch ${keys.length} tool${keys.length === 1 ? "" : "s"}` : "Pick at least one tool"}
+              <button className="btn-primary h-12 w-full text-[15px]" disabled={!keys.length || busy || overLimit} onClick={saveStack}>
+                {busy ? "Saving…" : overLimit ? `${keys.length} of ${max} selected` : keys.length ? `Watch ${keys.length} tool${keys.length === 1 ? "" : "s"}` : "Pick at least one tool"}
               </button>
             </div>
           </section>

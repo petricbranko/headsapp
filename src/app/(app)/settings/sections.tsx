@@ -13,6 +13,7 @@ export function PhoneSection({ phone }: { phone?: string }) {
   if (editing)
     return (
       <PhoneVerify
+        autoFocus={Boolean(phone)}
         onVerified={() => {
           setEditing(false);
           setNote("Verified. We sent you a test alert.");
