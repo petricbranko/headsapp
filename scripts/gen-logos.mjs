@@ -15,6 +15,8 @@ const MAP = {
   apache: "apache", caddy: "caddy", linux: "linux", ubuntu: "ubuntu", kubernetes: "kubernetes", openssl: "openssl", sentry: "sentry",
   datadog: "datadog", posthog: "posthog", mixpanel: "mixpanel", discord: "discord", notion: "notion", linear: "linear", figma: "figma",
   "google-workspace": "google", "1password": "1password", lastpass: "lastpass", zapier: "zapier",
+  // not catalog tools, used by the UI
+  whatsapp: "whatsapp", apple: "apple",
 };
 
 const out = {};
