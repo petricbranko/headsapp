@@ -126,7 +126,7 @@ export function WhatsAppMock({ messages, className = "" }: { messages: MockMessa
 /** A WhatsApp chat on an iPhone (used for marketing). */
 export function PhoneMock({ messages, className = "" }: { messages: MockMessage[]; className?: string }) {
   return (
-    <div className={`relative mx-auto w-[340px] rounded-[56px] bg-[#1b1b19] p-[11px] shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.06),0_40px_80px_-30px_rgba(40,35,20,0.35)] ${className}`}>
+    <div className={`relative mx-auto w-[340px] rounded-[56px] bg-[#1b1b19] p-[11px] shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.06),0_40px_80px_-30px_rgba(40,35,20,0.35)] dark:bg-[#2a2a27] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_40px_80px_-30px_rgba(0,0,0,0.8)] ${className}`}>
       <div className="relative overflow-hidden rounded-[45px] bg-[#f6f5f3] font-system dark:bg-[#1f2c34]">
         <div className="relative flex h-[48px] items-end justify-between px-8 pb-2 text-[14px] font-semibold text-[#111b21] dark:text-[#e9edef]">
           <span>9:41</span>
