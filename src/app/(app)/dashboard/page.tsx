@@ -79,7 +79,7 @@ export default async function Overview() {
         </Link>
       </section>
 
-      <div className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mt-8 grid grid-cols-[minmax(0,1fr)] items-start gap-8 xl:grid-cols-[minmax(0,1fr)_360px] [&>*]:min-w-0">
         <section>
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-[16px] font-semibold tracking-[-0.01em]">Needs your attention</h2>

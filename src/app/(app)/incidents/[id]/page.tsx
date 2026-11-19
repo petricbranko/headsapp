@@ -64,7 +64,7 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
         ))}
       </div>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px]">
+      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_260px] [&>*]:min-w-0">
         <div className="space-y-8">
           <section>
             <h2 className="text-[15px] font-semibold tracking-[-0.01em]">What happened</h2>
