@@ -1,4 +1,4 @@
-import { LOGOS } from "@/lib/logos.generated";
+import { LOGO_FILES } from "@/lib/logo-files.generated";
 
 /* Brands without a public logo get a clean letter tile in a stable, muted colour. */
 const TILE = [
@@ -11,25 +11,20 @@ function tile(name: string) {
   return TILE[h % TILE.length];
 }
 
-/** Brand logo tile for a stack key ("vendor:vercel", "npm:axios", "custom:Acme"). */
+/** Brand logo tile for a stack key ("vendor:vercel", "npm:axios", "custom:Acme"). Full-colour SVGs live in public/logos. */
 export function ToolLogo({ stackKey, name, size = 32 }: { stackKey: string; name: string; size?: number }) {
   const [kind, slug] = [stackKey.split(":")[0], stackKey.slice(stackKey.indexOf(":") + 1)];
-  const logo = kind === "vendor" ? LOGOS[slug] : undefined;
-  const inner = Math.round(size * 0.56);
+  const file = kind === "vendor" && LOGO_FILES.has(slug) ? slug : kind === "npm" ? "npm-registry" : null;
+  const inner = Math.round(size * 0.6);
   return (
     <span
-      className="grid shrink-0 place-items-center overflow-hidden rounded-[9px] bg-bg-muted"
+      className="grid shrink-0 place-items-center overflow-hidden bg-bg-muted"
       style={{ width: size, height: size, borderRadius: Math.max(6, size * 0.28) }}
       aria-hidden="true"
     >
-      {logo ? (
-        <svg width={inner} height={inner} viewBox="0 0 24 24">
-          <path d={logo.path} fill={`#${logo.hex}`} />
-        </svg>
-      ) : kind === "npm" ? (
-        <svg width={inner} height={inner} viewBox="0 0 24 24">
-          <path fill="#CB3837" d={LOGOS["npm-registry"]?.path ?? ""} />
-        </svg>
+      {file ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={`/logos/${file}.svg`} alt="" width={inner} height={inner} loading="lazy" decoding="async" className="object-contain" style={{ width: inner, height: inner }} />
       ) : (
         <span className="grid h-full w-full place-items-center font-semibold" style={{ background: tile(name)[0], color: tile(name)[1], fontSize: Math.max(10, size * 0.42), borderRadius: "inherit" }}>
           {name.replace(/[^A-Za-z0-9]/g, "").charAt(0).toUpperCase() || "?"}
