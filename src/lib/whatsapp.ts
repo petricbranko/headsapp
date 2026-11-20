@@ -57,7 +57,9 @@ async function twilioSend(to: string, body: string, parts?: AlertParts): Promise
   if (parts && t.alertContentSid) {
     // Approved WhatsApp template (required for business-initiated messages outside the 24h window).
     form.set("ContentSid", t.alertContentSid);
-    form.set("ContentVariables", JSON.stringify({ "1": parts.header, "2": parts.title, "3": parts.whatHappened, "4": parts.whatToDo.map((s) => `• ${s}`).join("\n"), "5": parts.url }));
+    // WhatsApp rejects template variables containing newlines, tabs or 4+ consecutive spaces.
+    const v = (s: string) => s.replace(/\s+/g, " ").trim();
+    form.set("ContentVariables", JSON.stringify({ "1": v(parts.header), "2": v(parts.title), "3": v(parts.whatHappened), "4": v(parts.whatToDo.join("; ")), "5": parts.url }));
   } else {
     form.set("Body", body);
   }
