@@ -147,20 +147,30 @@ export function AlertPrefs({ enabled, minSeverity, hasTelegram }: { enabled: boo
 
 export function DangerZone() {
   const [armed, setArmed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   return (
-    <button
-      className={`btn ${armed ? "bg-danger text-white" : "text-danger hover:bg-[#fdecec]"}`}
-      onClick={async () => {
-        if (!armed) {
-          setArmed(true);
-          setTimeout(() => setArmed(false), 4000);
-          return;
-        }
-        await call("/api/account", "DELETE");
-        window.location.href = "/logout";
-      }}
-    >
-      {armed ? "Click again to delete everything" : "Delete account"}
-    </button>
+    <div className="flex flex-wrap items-center gap-3">
+      <button
+        className={`btn ${armed ? "bg-danger text-white" : "text-danger hover:bg-[#fdecec]"}`}
+        onClick={async () => {
+          if (!armed) {
+            setArmed(true);
+            setError(null);
+            setTimeout(() => setArmed(false), 4000);
+            return;
+          }
+          try {
+            await call("/api/account", "DELETE");
+            window.location.href = "/logout";
+          } catch (e) {
+            setArmed(false);
+            setError((e as Error).message);
+          }
+        }}
+      >
+        {armed ? "Click again to delete everything" : "Delete account"}
+      </button>
+      {error && <span className="text-[13px] text-danger">{error}</span>}
+    </div>
   );
 }

@@ -43,3 +43,6 @@ export interface Paywall {
 export async function paywall(_user: UserDoc): Promise<Paywall | null> {
   return null;
 }
+
+/** Called before an account is deleted (cloud: cancels the subscription). Throw to stop the deletion. */
+export async function beforeDeleteAccount(_user: UserDoc): Promise<void> {}
