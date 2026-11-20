@@ -37,7 +37,7 @@ Production builds never enable dev login or local-mode Telegram.
 ## Self-hosting (DigitalOcean or any Docker host)
 
 ```bash
-git clone <this repo> && cd headsapp
+git clone https://github.com/petricbranko/headsapp.git && cd headsapp
 cp .env.example .env    # fill in Auth0, TELEGRAM_BOT_TOKEN, SESSION_SECRET, APP_BASE_URL, DOMAIN
 docker compose up -d --build
 ```
