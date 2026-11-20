@@ -1,6 +1,6 @@
 import "server-only";
 import { fetchJson, pool } from "./http";
-import { STATUS_SECURITY_RE } from "./match";
+import { isSecurityStatusText } from "./match";
 import type { RawIncident, SourceResult } from "./types";
 import { CATALOG, vendorKey } from "../catalog";
 import { truncate, stripHtml } from "../text";
@@ -32,7 +32,7 @@ export async function fetchStatusPages(): Promise<SourceResult> {
     for (const inc of data.incidents ?? []) {
       const updates = (inc.incident_updates ?? []).map((u) => stripHtml(u.body ?? ""));
       const text = `${inc.name} ${updates.join(" ")}`;
-      if (!STATUS_SECURITY_RE.test(text)) continue;
+      if (!isSecurityStatusText(text)) continue;
       const first = updates[updates.length - 1] ?? inc.name;
       incidents.push({
         sourceId: `status:${e.slug}:${inc.id}`,

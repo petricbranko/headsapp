@@ -13,6 +13,17 @@ export const SECURITY_RE = /\b(security|breach|hack|compromis|leak|exposed|stole
  */
 export const STATUS_SECURITY_RE = /\b(security (incident|issue|event|breach|vulnerability|notice|advisory|update)|data breach|breach of|unauthori[sz]ed (access|activity|actor|party|parties|third part(y|ies))|(account|accounts|systems?|credentials?|tokens?|keys?) (were|was|have been|has been|may have been) (compromised|exposed|accessed)|compromised (account|credentials|tokens?|keys?|systems?)|threat actor|malicious (actor|activity|package|code)|phishing campaign|rotate (your|all)? ?(api )?(keys|tokens|credentials|secrets)|(credentials?|tokens?|secrets?|api keys?) (rotation|reset|revoked|rotated|exposure))\b/i;
 
+/**
+ * Drop negated mentions before matching, e.g. "caused by a bug, not due to a security incident"
+ * or "there is no evidence of unauthorized access". Removes from the negation to the end of the clause.
+ */
+const NEGATED_RE = /\b(not|no|never|without|isn't|wasn't|weren't|aren't|is not|was not|were not|are not|nor|rule[sd]? out|unrelated to)\b[^.;:!?]{0,80}/gi;
+
+/** True when a status-page incident talks about security (and isn't saying it's NOT security). */
+export function isSecurityStatusText(text: string): boolean {
+  return STATUS_SECURITY_RE.test(text.replace(NEGATED_RE, " "));
+}
+
 interface Compiled {
   entry: CatalogEntry;
   res: RegExp[];
