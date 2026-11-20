@@ -26,8 +26,11 @@ export interface UserDoc {
   stack: StackItem[];
   /** Where alerts go. Set when the user presses Start in the bot via their one-time link. */
   telegram?: TelegramLink;
-  /** Hash of the current one-time connect token (the raw token only lives in the t.me link). */
-  pendingTelegram?: { tokenHash: string; expiresAt: Date };
+  /**
+   * Hashes of recent one-time connect tokens (raw tokens only live in t.me links). Several stay
+   * valid so a link from another tab or an earlier render still works.
+   */
+  telegramTokens?: { tokenHash: string; expiresAt: Date }[];
   prefs: { alertsEnabled: boolean; minSeverity: Severity };
   onboardedAt?: Date;
   plan?: string; // edition-defined (cloud: "free" | "pro")

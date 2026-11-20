@@ -22,12 +22,14 @@ const TOKEN_TTL_MS = 15 * 60 * 1000;
 
 const hashToken = (t: string) => createHash("sha256").update(t).digest("hex");
 
-/** Create a fresh connect link for this user (replaces any earlier unused one). */
+/** Create a fresh connect link for this user. */
 export async function createConnectLink(user: UserDoc): Promise<{ url: string; issuedAt: string }> {
   const token = randomBytes(24).toString("base64url"); // 32 chars, allowed in /start payloads
   const issuedAt = new Date();
   const { users } = await cols();
-  await users.updateOne({ _id: user._id }, { $set: { pendingTelegram: { tokenHash: hashToken(token), expiresAt: new Date(issuedAt.getTime() + TOKEN_TTL_MS) }, updatedAt: issuedAt } });
+  const entry = { tokenHash: hashToken(token), expiresAt: new Date(issuedAt.getTime() + TOKEN_TTL_MS) };
+  // Keep the 5 newest links valid: two tabs, or two requests racing, must not invalidate each other.
+  await users.updateOne({ _id: user._id }, { $push: { telegramTokens: { $each: [entry], $slice: -5 } }, $set: { updatedAt: issuedAt } });
   return { url: `https://t.me/${await botUsername()}?start=${token}`, issuedAt: issuedAt.toISOString() };
 }
 
@@ -36,7 +38,7 @@ export async function linkTelegram(userId: UserDoc["_id"], link: Omit<TelegramLi
   const { users } = await cols();
   const fresh = await users.findOneAndUpdate(
     { _id: userId },
-    { $set: { telegram: { ...link, connectedAt: new Date() }, "prefs.alertsEnabled": true, updatedAt: new Date() }, $unset: { pendingTelegram: "" } },
+    { $set: { telegram: { ...link, connectedAt: new Date() }, "prefs.alertsEnabled": true, updatedAt: new Date() }, $unset: { telegramTokens: "" } },
     { returnDocument: "after" },
   );
   if (fresh && (await canReceiveAlerts(fresh))) await sendTestAlert(fresh);
@@ -72,7 +74,7 @@ export async function handleUpdate(u: Update): Promise<void> {
   const command = cmd.toLowerCase().replace(/@\w+$/, "");
 
   if (command === "/start" && payload) {
-    const user = await users.findOne({ "pendingTelegram.tokenHash": hashToken(payload), "pendingTelegram.expiresAt": { $gt: new Date() } });
+    const user = await users.findOne({ telegramTokens: { $elemMatch: { tokenHash: hashToken(payload), expiresAt: { $gt: new Date() } } } });
     if (!user) {
       await reply(chatId, `This link has expired. Open ${appLink()} and click <b>Connect Telegram</b> again.`);
       return;
