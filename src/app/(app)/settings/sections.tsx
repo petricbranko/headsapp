@@ -2,26 +2,27 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PhoneVerify } from "@/components/phone-verify";
+import { TelegramConnect, TelegramIcon } from "@/components/telegram-connect";
 import { call } from "@/components/api";
 
-export function PhoneSection({ phone, display }: { phone?: string; display?: string }) {
+export function TelegramSection({ label, since }: { label?: string; since?: string }) {
   const router = useRouter();
-  const [editing, setEditing] = useState(!phone);
+  const [editing, setEditing] = useState(!label);
   const [note, setNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   if (editing)
     return (
-      <div className="space-y-3">
-        <PhoneVerify
-          autoFocus={Boolean(phone)}
-          onVerified={() => {
+      <div className="max-w-[420px] space-y-3">
+        <TelegramConnect
+          label={label ? "Connect a different account" : "Connect Telegram"}
+          onConnected={() => {
             setEditing(false);
-            setNote("Verified. We sent you a test alert.");
+            setNote("Connected. We sent you a test alert.");
             router.refresh();
           }}
         />
-        {phone && (
+        {label && (
           <button className="text-[13px] text-fg-muted hover:text-fg" onClick={() => setEditing(false)}>
             Cancel
           </button>
@@ -30,16 +31,34 @@ export function PhoneSection({ phone, display }: { phone?: string; display?: str
     );
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[15px] font-medium tabular-nums">{display ?? phone}</div>
-          <div className="mt-0.5 text-[13px] text-fg-muted">
-            Verified
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="grid size-9 place-items-center rounded-full bg-[#2aabee] text-white">
+            <TelegramIcon size={18} />
+          </span>
+          <div>
+            <div className="text-[15px] font-medium">{label}</div>
+            <div className="mt-0.5 text-[13px] text-fg-muted">Connected{since ? ` since ${since}` : ""}</div>
           </div>
         </div>
-        <button className="btn-secondary btn-sm" onClick={() => setEditing(true)}>
-          Change
-        </button>
+        <div className="flex gap-2">
+          <button className="btn-secondary btn-sm" onClick={() => setEditing(true)}>
+            Change
+          </button>
+          <button
+            className="btn-ghost btn-sm text-fg-muted"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              await call("/api/telegram/disconnect", "POST").catch(() => {});
+              setBusy(false);
+              setEditing(true);
+              router.refresh();
+            }}
+          >
+            Disconnect
+          </button>
+        </div>
       </div>
       {note && <p className="text-[13px] text-fg-muted">{note}</p>}
     </div>
@@ -52,7 +71,7 @@ const LEVELS = [
   { v: "medium", label: "Medium and up" },
 ] as const;
 
-export function AlertPrefs({ enabled, minSeverity, hasPhone }: { enabled: boolean; minSeverity: string; hasPhone: boolean }) {
+export function AlertPrefs({ enabled, minSeverity, hasTelegram }: { enabled: boolean; minSeverity: string; hasTelegram: boolean }) {
   const router = useRouter();
   const [on, setOn] = useState(enabled);
   const [level, setLevel] = useState(minSeverity);
@@ -67,14 +86,14 @@ export function AlertPrefs({ enabled, minSeverity, hasPhone }: { enabled: boolea
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <div className="text-[14px] font-medium">WhatsApp alerts</div>
-          <div className="text-[13px] text-fg-muted">Pause messages without losing your setup.</div>
+          <div className="text-[14px] font-medium">Telegram alerts</div>
+          <div className="text-[13px] text-fg-muted">Pause messages without losing your setup. You can also send /stop to the bot.</div>
         </div>
         <button
           type="button"
           role="switch"
           aria-checked={on}
-          aria-label="WhatsApp alerts"
+          aria-label="Telegram alerts"
           onClick={() => {
             setOn(!on);
             save({ alertsEnabled: !on });
@@ -106,12 +125,12 @@ export function AlertPrefs({ enabled, minSeverity, hasPhone }: { enabled: boolea
       <div className="flex items-center gap-3">
         <button
           className="btn-secondary"
-          disabled={!hasPhone}
+          disabled={!hasTelegram}
           onClick={async () => {
             setTest("Sending…");
             try {
               const r = await call<{ message: { provider: string } }>("/api/alerts/test", "POST");
-              setTest(r.message.provider === "console" ? "Logged locally (Twilio not configured)." : "Sent. Check WhatsApp.");
+              setTest(r.message.provider === "console" ? "Logged locally (no Telegram bot configured)." : "Sent. Check Telegram.");
               router.refresh();
             } catch (e) {
               setTest((e as Error).message);

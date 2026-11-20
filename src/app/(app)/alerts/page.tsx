@@ -1,9 +1,9 @@
 import { requireUser } from "@/lib/auth";
 import { cols } from "@/lib/db";
-import { messagingMode } from "@/lib/whatsapp";
+import { messagingMode } from "@/lib/telegram";
 import { summarizeMessage } from "@/lib/alert-text";
 import { PageHeader } from "@/components/page-header";
-import { WhatsAppBubble } from "@/components/whatsapp-mock";
+import { MessageBubble } from "@/components/message-preview";
 
 export const metadata = { title: "Alerts" };
 
@@ -23,7 +23,7 @@ export default async function AlertsPage() {
     <div>
       <PageHeader
         title="Alerts"
-        description={consoleMode ? "Messages sent to your WhatsApp. Twilio isn't configured here, so they're logged instead of delivered." : "Messages sent to your WhatsApp."}
+        description={consoleMode ? "Messages sent to your Telegram. No bot is configured here, so they're logged instead of delivered." : "Messages sent to your Telegram."}
       />
       <div className="border-t border-border">
         {list.length === 0 ? (
@@ -51,7 +51,7 @@ export default async function AlertsPage() {
                     </summary>
                     <div className="pb-5">
                       <div className="max-w-[420px]">
-                        <WhatsAppBubble body={m.body} time={m.createdAt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })} />
+                        <MessageBubble body={m.body} time={m.createdAt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })} />
                       </div>
                     </div>
                   </details>

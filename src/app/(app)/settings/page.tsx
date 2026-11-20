@@ -1,9 +1,9 @@
 import { requireUser } from "@/lib/auth";
 import SettingsExtra from "@/edition/settings-extra";
 import { PageHeader } from "@/components/page-header";
-import { PhoneSection, AlertPrefs, DangerZone } from "./sections";
+import { TelegramSection, AlertPrefs, DangerZone } from "./sections";
 import { SettingsCard } from "@/components/settings-card";
-import { formatPhone } from "@/lib/text";
+import { telegramLabel } from "@/lib/telegram";
 
 export const metadata = { title: "Settings" };
 
@@ -13,11 +13,11 @@ export default async function SettingsPage() {
     <div>
       <PageHeader title="Settings" />
       <div className="max-w-[1000px]">
-        <SettingsCard title="WhatsApp number" description="Where alerts are sent. We verify it with a one-time code.">
-          <PhoneSection phone={user.phone?.e164} display={user.phone ? formatPhone(user.phone.e164) : undefined} />
+        <SettingsCard title="Telegram" description="Where alerts are sent, as messages from the HeadsApp bot.">
+          <TelegramSection label={telegramLabel(user.telegram) || undefined} since={user.telegram?.connectedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} />
         </SettingsCard>
         <SettingsCard title="Alerts" description="Choose what is worth a message. Everything else still shows up under Incidents.">
-          <AlertPrefs enabled={user.prefs.alertsEnabled} minSeverity={user.prefs.minSeverity} hasPhone={Boolean(user.phone)} />
+          <AlertPrefs enabled={user.prefs.alertsEnabled} minSeverity={user.prefs.minSeverity} hasTelegram={Boolean(user.telegram)} />
         </SettingsCard>
         <SettingsExtra user={user} />
         <SettingsCard title="Account" description={user.email}>

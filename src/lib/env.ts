@@ -16,13 +16,10 @@ export const env = {
 
   auth0Configured: Boolean(val("AUTH0_DOMAIN") && val("AUTH0_CLIENT_ID") && val("AUTH0_CLIENT_SECRET") && val("AUTH0_SECRET")),
 
-  twilio: {
-    accountSid: val("TWILIO_ACCOUNT_SID"),
-    authToken: val("TWILIO_AUTH_TOKEN"),
-    whatsappFrom: val("TWILIO_WHATSAPP_FROM"), // e.g. whatsapp:+14155238886
-    verifyServiceSid: val("TWILIO_VERIFY_SERVICE_SID"),
-    alertContentSid: val("TWILIO_ALERT_CONTENT_SID"), // optional approved template
-  },
+  /** Telegram bot token from @BotFather. Without it, messages are logged in the app instead. */
+  telegramBotToken: val("TELEGRAM_BOT_TOKEN"),
+  /** Bot API base URL; only change it for a self-hosted Bot API server. */
+  telegramApiUrl: (val("TELEGRAM_API_URL") ?? "https://api.telegram.org").replace(/\/$/, ""),
 
   openrouter: {
     apiKey: val("OPENROUTER_API_KEY"),
@@ -35,14 +32,8 @@ export const env = {
   maxAlertsPerDay: Number(val("MAX_ALERTS_PER_DAY") ?? 5),
 };
 
-export function twilioMessagingConfigured() {
-  const t = env.twilio;
-  return Boolean(t.accountSid && t.authToken && t.whatsappFrom);
-}
-
-export function twilioVerifyConfigured() {
-  const t = env.twilio;
-  return Boolean(t.accountSid && t.authToken && t.verifyServiceSid);
+export function telegramConfigured() {
+  return Boolean(env.telegramBotToken);
 }
 
 export type AuthMode = "auth0" | "dev" | "unconfigured";

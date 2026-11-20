@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { StackBuilder, SelectedStack } from "@/components/stack-builder";
-import { PhoneVerify } from "@/components/phone-verify";
-import { WhatsAppBubble } from "@/components/whatsapp-mock";
+import { TelegramConnect } from "@/components/telegram-connect";
+import { MessageBubble } from "@/components/message-preview";
 import { ToolLogo } from "@/components/tool-logo";
 import { labelForKey } from "@/lib/catalog";
 import { call } from "@/components/api";
@@ -15,7 +15,7 @@ import type { Paywall } from "@/edition";
 type Step = 0 | "pay" | 1 | 2;
 interface SentMessage {
   body: string;
-  provider: "twilio" | "console";
+  provider: "telegram" | "console";
   createdAt: string;
 }
 
@@ -25,7 +25,7 @@ function stepOrder(withSubscribe: boolean): Step[] {
 
 function Progress({ step, withSubscribe }: { step: Step; withSubscribe: boolean }) {
   const order = stepOrder(withSubscribe);
-  const labels: Record<string, string> = { "0": "Your stack", pay: "Subscribe", "1": "WhatsApp", "2": "Done" };
+  const labels: Record<string, string> = { "0": "Your stack", pay: "Subscribe", "1": "Telegram", "2": "Done" };
   const STEPS = order.map((o) => labels[String(o)]);
   const idx = order.indexOf(step);
   return (
@@ -52,8 +52,8 @@ export function Onboarding({
   initialStep = 0,
   paywall,
   initialStack,
-  hasPhone,
-  phone,
+  hasTelegram,
+  telegramLabel,
   consoleMode,
   max,
   limitHint,
@@ -62,8 +62,8 @@ export function Onboarding({
   initialStep?: Step;
   paywall: Paywall | null;
   initialStack: string[];
-  hasPhone: boolean;
-  phone?: string;
+  hasTelegram: boolean;
+  telegramLabel?: string;
   consoleMode: boolean;
   max: number;
   limitHint?: string;
@@ -77,7 +77,7 @@ export function Onboarding({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState<SentMessage | null>(null);
-  const [to, setTo] = useState(phone);
+  const [to, setTo] = useState(telegramLabel);
   const overLimit = keys.length > max;
 
   async function saveStack() {
@@ -86,7 +86,7 @@ export function Onboarding({
     try {
       await call("/api/stack", "PUT", { keys });
       if (paywall) setStep("pay");
-      else if (hasPhone) {
+      else if (hasTelegram) {
         const r = await call<{ message: SentMessage }>("/api/alerts/test", "POST");
         setSent(r.message);
         setStep(2);
@@ -172,15 +172,22 @@ export function Onboarding({
         <main className="flex flex-1 items-start justify-center px-6 py-16 sm:py-24">
           <div className="w-full max-w-[460px] animate-in">
             <div className="kicker">Step {stepNo(1)} of {total}</div>
-            <h1 className="heading mt-2 text-[32px]">Where should we send alerts?</h1>
-            <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">Your WhatsApp number. We&apos;ll verify it and send a test alert right away.</p>
+            <h1 className="heading mt-2 text-[32px]">Connect Telegram</h1>
+            <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">Alerts arrive as messages from the HeadsApp bot. We&apos;ll send a test alert as soon as you&apos;re connected.</p>
             <div className="mt-8">
-              <PhoneVerify
-                onVerified={async (e164) => {
-                  setTo(e164);
-                  const r = await call<{ messages: SentMessage[] }>("/api/messages?limit=1");
-                  // (no test message is sent if alerts aren't enabled for this account)
-                  setSent(r.messages[0] ?? null);
+              <TelegramConnect
+                onConnected={async (label) => {
+                  setTo(label);
+                  // The bot sends the test alert right after connecting; give it a moment to land.
+                  // (No test is sent if alerts aren't enabled for this account.)
+                  for (let i = 0; i < 4; i++) {
+                    const r = await call<{ messages: SentMessage[] }>("/api/messages?limit=1").catch(() => ({ messages: [] as SentMessage[] }));
+                    if (r.messages[0]) {
+                      setSent(r.messages[0]);
+                      break;
+                    }
+                    await new Promise((res) => setTimeout(res, 1000));
+                  }
                   setStep(2);
                 }}
               />
@@ -190,7 +197,7 @@ export function Onboarding({
                 ← Back to stack
               </button>
               <button className="text-fg-muted hover:text-fg" onClick={finish}>
-                Set up WhatsApp later
+                Connect Telegram later
               </button>
             </div>
           </div>
@@ -205,11 +212,11 @@ export function Onboarding({
             </div>
             <h1 className="heading mt-6 text-[32px]">You&apos;re all set</h1>
             <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">
-              {consoleMode ? "We sent your test alert. Twilio isn't configured here, so it was logged instead. This is exactly what you'll get:" : `We sent a test alert to ${to}. Real alerts look exactly like this:`}
+              {consoleMode ? "We sent your test alert. No Telegram bot is configured here, so it was logged instead. This is exactly what you'll get:" : `We sent a test alert to ${to} on Telegram. Real alerts look exactly like this:`}
             </p>
             {sent && (
               <div className="mt-6">
-                <WhatsAppBubble body={sent.body} time={clock(sent.createdAt)} />
+                <MessageBubble body={sent.body} time={clock(sent.createdAt)} />
               </div>
             )}
             <div className="mt-6 flex items-center gap-2">

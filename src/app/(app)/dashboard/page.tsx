@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { cols } from "@/lib/db";
 import { labelForKey } from "@/lib/catalog";
 import { timeAgo } from "@/lib/time";
-import { maskPhone } from "@/lib/text";
+import { telegramLabel } from "@/lib/telegram";
 import { summarizeMessage } from "@/lib/alert-text";
 import { SeverityBadge } from "@/components/severity";
 import { ToolLogo } from "@/components/tool-logo";
@@ -44,12 +44,12 @@ export default async function Overview() {
           <h1 className="heading text-[30px]">{covered ? "All clear" : `${open.length} ${open.length === 1 ? "incident needs" : "incidents need"} your attention`}</h1>
           <p className="mt-2 text-[14px] text-fg-muted">
             Monitoring {keys.length} {keys.length === 1 ? "tool" : "tools"}
-            {user.phone ? <>, alerts go to {maskPhone(user.phone.e164)}</> : null}
+            {user.telegram ? <>, alerts go to {telegramLabel(user.telegram)} on Telegram</> : null}
             {lastCheck?.lastOkAt ? <>. Last checked {timeAgo(lastCheck.lastOkAt)}.</> : "."}
           </p>
-          {!user.phone && (
+          {!user.telegram && (
             <Link href="/settings" className="mt-2 inline-block text-[14px] font-medium text-fg underline underline-offset-4">
-              Add your WhatsApp number to get alerts
+              Connect Telegram to get alerts
             </Link>
           )}
         </div>
@@ -67,7 +67,7 @@ export default async function Overview() {
             </Link>
           </div>
           {open.length === 0 ? (
-            <p className="py-10 text-[14px] text-fg-muted">Nothing to do. We&apos;ll message you on WhatsApp the moment something hits your stack.</p>
+            <p className="py-10 text-[14px] text-fg-muted">Nothing to do. We&apos;ll message you on Telegram the moment something hits your stack.</p>
           ) : (
             <ul className="divide-y divide-border">
               {open.map((inc) => {

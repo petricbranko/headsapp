@@ -21,7 +21,7 @@ export function planLabel(_user: UserDoc): string | null {
   return null;
 }
 
-/** Whether this user may receive WhatsApp alerts (cloud: active subscription). */
+/** Whether this user may receive alerts (cloud: active subscription). */
 export async function canReceiveAlerts(_user: UserDoc): Promise<boolean> {
   return true;
 }

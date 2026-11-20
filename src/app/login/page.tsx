@@ -17,7 +17,7 @@ export default async function LoginPage() {
       <main className="flex flex-1 items-start justify-center px-6 pt-[10vh]">
         <div className="card w-full max-w-[420px] p-8 shadow-[var(--shadow-lg)] animate-in">
           <h1 className="heading text-[24px]">Sign in to HeadsApp</h1>
-          <p className="mt-2 text-[14px] text-fg-muted">Security alerts for your stack, on WhatsApp.</p>
+          <p className="mt-2 text-[14px] text-fg-muted">Security alerts for your stack, on Telegram.</p>
 
           {mode === "auth0" && (
             <div className="mt-7 space-y-2.5">

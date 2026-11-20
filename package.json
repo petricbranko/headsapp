@@ -2,7 +2,7 @@
   "name": "headsapp",
   "version": "0.1.0",
   "private": true,
-  "description": "WhatsApp alerts when a security incident hits a tool in your stack.",
+  "description": "Telegram alerts when a security incident hits a tool in your stack.",
   "license": "MIT",
   "scripts": {
     "dev": "node scripts/dev.mjs",
@@ -10,8 +10,6 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "prebuild": "node scripts/copy-flags.mjs",
-    "predev": "node scripts/copy-flags.mjs",
     "logos": "node scripts/gen-logos.mjs"
   },
   "engines": {
@@ -19,9 +17,7 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.33.0",
-    "country-flag-icons": "^1.6.20",
     "fast-xml-parser": "^5.12.1",
-    "libphonenumber-js": "^1.13.17",
     "mongodb": "^7.9.0",
     "next": "^16.4.6",
     "react": "^19.3.1",

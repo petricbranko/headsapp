@@ -1,5 +1,12 @@
 import type { ObjectId } from "mongodb";
 
+export interface TelegramLink {
+  chatId: number;
+  username?: string;
+  firstName?: string;
+  connectedAt: Date;
+}
+
 export type Severity = "critical" | "high" | "medium" | "low";
 export const SEVERITY_RANK: Record<Severity, number> = { critical: 4, high: 3, medium: 2, low: 1 };
 
@@ -17,8 +24,10 @@ export interface UserDoc {
   email?: string;
   name?: string;
   stack: StackItem[];
-  phone?: { e164: string; verifiedAt: Date };
-  pendingPhone?: { e164: string; codeHash?: string; expiresAt: Date; attempts: number };
+  /** Where alerts go. Set when the user presses Start in the bot via their one-time link. */
+  telegram?: TelegramLink;
+  /** Hash of the current one-time connect token (the raw token only lives in the t.me link). */
+  pendingTelegram?: { tokenHash: string; expiresAt: Date };
   prefs: { alertsEnabled: boolean; minSeverity: Severity };
   onboardedAt?: Date;
   plan?: string; // edition-defined (cloud: "free" | "pro")
@@ -61,12 +70,12 @@ export interface AlertDoc {
 export interface MessageDoc {
   _id?: ObjectId;
   userId?: ObjectId;
-  to: string; // masked when displayed
-  kind: "alert" | "test" | "verify";
+  to: string; // display label, e.g. "@jane"
+  kind: "alert" | "test";
   body: string;
-  provider: "twilio" | "console";
+  provider: "telegram" | "console";
   status: "sent" | "logged" | "failed";
-  providerId?: string;
+  providerId?: string; // Telegram message_id
   error?: string;
   createdAt: Date;
 }
@@ -99,4 +108,11 @@ export interface IncidentStateDoc {
 export interface LockDoc {
   _id: string;
   expiresAt: Date;
+}
+
+/** Small key/value store for server state (e.g. the Telegram update offset). */
+export interface KvDoc {
+  _id: string;
+  value: unknown;
+  updatedAt: Date;
 }

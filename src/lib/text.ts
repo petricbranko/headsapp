@@ -1,4 +1,3 @@
-import { parsePhoneNumberFromString } from "libphonenumber-js";
 /** Small text helpers shared by sources, formatting and UI. */
 export function stripHtml(s: string): string {
   return s
@@ -38,15 +37,6 @@ export function lede(s: string, n = 280): string {
     .replace(/\s+/g, " ")
     .trim();
   return truncate(clean, n);
-}
-
-export function formatPhone(e164: string): string {
-  return parsePhoneNumberFromString(e164)?.formatInternational() ?? e164;
-}
-
-export function maskPhone(e164: string): string {
-  if (e164.length < 6) return e164;
-  return e164.slice(0, 3) + " ••• ••" + e164.slice(-2);
 }
 
 export function escapeRe(s: string) {

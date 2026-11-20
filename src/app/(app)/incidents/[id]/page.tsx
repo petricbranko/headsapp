@@ -36,11 +36,11 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
         : added.length && inc.fetchedAt.getTime() < Math.min(...added)
           ? "This was published before you added it to your stack, so we didn't message you."
           : SEVERITY_RANK[inc.severity] < SEVERITY_RANK[user.prefs.minSeverity]
-            ? "It's below the severity you chose for WhatsApp alerts."
+            ? "It's below the severity you chose for alerts."
             : !user.prefs.alertsEnabled
-              ? "WhatsApp alerts are paused in Settings."
-              : !user.phone
-                ? "Add a WhatsApp number in Settings to get alerts."
+              ? "Alerts are paused in Settings."
+              : !user.telegram
+                ? "Connect Telegram in Settings to get alerts."
                 : "It was more than 48 hours old when we found it.";
 
   return (
@@ -94,7 +94,7 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
           <div>
-            <div className="font-semibold">WhatsApp alert</div>
+            <div className="font-semibold">Telegram alert</div>
             <p className="mt-1 text-[13.5px] leading-relaxed text-fg-muted">{sent ? why : `Not sent. ${why}`}</p>
           </div>
         </aside>

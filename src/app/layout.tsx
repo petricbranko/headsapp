@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", axes: ["opsz
 
 export const metadata: Metadata = {
   title: { default: "HeadsApp: know when your stack gets hacked", template: "%s · HeadsApp" },
-  description: "HeadsApp watches security news 24/7 and sends you a WhatsApp message when something hits a tool you use.",
+  description: "HeadsApp watches security news 24/7 and sends you a Telegram message when something hits a tool you use.",
   metadataBase: new URL(process.env.APP_BASE_URL ?? "http://localhost:3000"),
 };
 

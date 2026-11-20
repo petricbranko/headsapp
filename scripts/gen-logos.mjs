@@ -16,7 +16,7 @@ const MAP = {
   datadog: "datadog", posthog: "posthog", mixpanel: "mixpanel", discord: "discord", notion: "notion", linear: "linear", figma: "figma",
   "google-workspace": "google", "1password": "1password", lastpass: "lastpass", zapier: "zapier",
   // not catalog tools, used by the UI
-  whatsapp: "whatsapp", apple: "apple",
+  telegram: "telegram", apple: "apple",
 };
 
 const out = {};

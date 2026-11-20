@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 
-/** Render WhatsApp formatting (*bold*, _italic_, links) as React nodes. Never uses innerHTML. */
-export function WaText({ text }: { text: string }) {
+/** Render light message formatting (*bold*, _italic_, links) as React nodes. Never uses innerHTML. */
+export function MessageText({ text }: { text: string }) {
   return (
     <>
       {text.split("\n").map((line, i) => (
@@ -27,7 +27,7 @@ function renderLine(line: string) {
     else if (t.startsWith("_")) out.push(<em key={k++} className="opacity-75">{t.slice(1, -1)}</em>);
     else
       out.push(
-        <a key={k++} href={t} target="_blank" rel="noopener noreferrer nofollow" className="break-all text-[#027eb5] hover:underline dark:text-[#53bdeb]">
+        <a key={k++} href={t} target="_blank" rel="noopener noreferrer nofollow" className="break-all text-[#168acd] hover:underline">
           {t.replace(/^https?:\/\//, "")}
         </a>,
       );

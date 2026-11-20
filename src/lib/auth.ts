@@ -92,7 +92,6 @@ export function api<C = unknown>(handler: Handler<C>) {
     } catch (err) {
       if (err instanceof HttpError) return NextResponse.json({ error: err.message }, { status: err.status });
       const e = err as { status?: number; message?: string; name?: string };
-      if (e.name === "VerifyError") return NextResponse.json({ error: e.message }, { status: e.status ?? 400 });
       if (e.name === "ZodError") return NextResponse.json({ error: "Invalid input" }, { status: 400 });
       console.error("[api]", err);
       return NextResponse.json({ error: "Something went wrong" }, { status: 500 });

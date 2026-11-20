@@ -2,11 +2,11 @@ import "server-only";
 import { cols } from "./db";
 import { env } from "./env";
 import { SEVERITY_RANK, type AlertDoc, type IncidentDoc, type UserDoc } from "./types";
-import { alertParts, formatAlert, sendWhatsApp } from "./whatsapp";
+import { alertParts, formatAlert, formatAlertHtml, sendTelegram } from "./telegram";
 import { hit } from "./rate";
 import { canReceiveAlerts } from "@/edition";
 
-/** Incidents older than this are shown in the dashboard but never pushed to WhatsApp. */
+/** Incidents older than this are shown in the dashboard but never pushed to Telegram. */
 export const FRESH_MS = 48 * 3600 * 1000;
 
 export function isFresh(inc: Pick<IncidentDoc, "publishedAt">) {
@@ -25,7 +25,7 @@ export async function fanout(inc: IncidentDoc): Promise<{ sent: number; skipped:
   let skipped = 0;
   if (!inc._id || !isFresh(inc) || !inc.targets.length) return { sent, skipped };
 
-  const cursor = users.find({ "stack.key": { $in: inc.targets }, "prefs.alertsEnabled": true, phone: { $exists: true } });
+  const cursor = users.find({ "stack.key": { $in: inc.targets }, "prefs.alertsEnabled": true, telegram: { $exists: true } });
   for await (const user of cursor) {
     if (!(await canReceiveAlerts(user))) continue;
     const target = user.stack.find((s) => inc.targets.includes(s.key))!.key;
@@ -52,7 +52,7 @@ export async function fanout(inc: IncidentDoc): Promise<{ sent: number; skipped:
     // Claim the (user, incident) pair before sending so concurrent runs can't double-send.
     if (!(await insertOnce({ ...base, status: "logged", reason: "sending" }))) continue;
     const parts = alertParts(inc, target);
-    const msg = await sendWhatsApp({ userId: user._id, to: user.phone!.e164, body: formatAlert(parts), kind: "alert", parts });
+    const msg = await sendTelegram({ userId: user._id, telegram: user.telegram!, body: formatAlert(parts), html: formatAlertHtml(parts), kind: "alert" });
     await alerts.updateOne(
       { userId: user._id, incidentId: inc._id, kind: "incident" },
       msg.error ? { $set: { status: msg.status, reason: msg.error } } : { $set: { status: msg.status }, $unset: { reason: "" } },
@@ -83,13 +83,13 @@ const SAMPLE: Pick<IncidentDoc, "severity" | "title" | "whatHappened" | "whatToD
 
 /** Send a test alert. Uses the most recent real incident for the user's stack when there is one. */
 export async function sendTestAlert(user: UserDoc) {
-  if (!user.phone) throw new Error("no phone");
+  if (!user.telegram) throw new Error("Telegram not connected");
   const { incidents, alerts } = await cols();
   const keys = user.stack.map((s) => s.key);
   const real = keys.length ? await incidents.find({ targets: { $in: keys }, severity: { $in: ["critical", "high"] } }).sort({ publishedAt: -1 }).limit(1).next() : null;
   const target = real ? real.targets.find((t) => keys.includes(t))! : keys[0] ?? "vendor:vercel";
   const parts = alertParts(real ?? SAMPLE, target);
-  const msg = await sendWhatsApp({ userId: user._id, to: user.phone.e164, body: formatAlert(parts, { test: true }), kind: "test", parts });
+  const msg = await sendTelegram({ userId: user._id, telegram: user.telegram, body: formatAlert(parts, { test: true }), html: formatAlertHtml(parts, { test: true }), kind: "test" });
   await alerts.insertOne({ userId: user._id!, kind: "test", target, status: msg.status, reason: msg.error, createdAt: new Date() });
   return msg;
 }

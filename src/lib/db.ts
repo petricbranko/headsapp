@@ -1,7 +1,7 @@
 import "server-only";
 import { MongoClient, type Db, type Collection, ObjectId } from "mongodb";
 import { env } from "./env";
-import type { UserDoc, IncidentDoc, AlertDoc, MessageDoc, SourceStateDoc, RateDoc, LockDoc, IncidentStateDoc } from "./types";
+import type { UserDoc, IncidentDoc, AlertDoc, MessageDoc, SourceStateDoc, RateDoc, LockDoc, IncidentStateDoc, KvDoc } from "./types";
 
 type G = typeof globalThis & { __headsappMongo?: Promise<MongoClient>; __headsappIndexes?: Promise<void> };
 const g = globalThis as G;
@@ -35,6 +35,7 @@ export async function cols() {
     rates: d.collection<RateDoc>("rates") as Collection<RateDoc>,
     locks: d.collection<LockDoc>("locks") as Collection<LockDoc>,
     states: d.collection<IncidentStateDoc>("incident_states") as Collection<IncidentStateDoc>,
+    kv: d.collection<KvDoc>("kv") as Collection<KvDoc>,
   };
 }
 
@@ -43,6 +44,8 @@ async function ensureIndexes(d: Db) {
     d.collection("users").createIndex({ authSub: 1 }, { unique: true }),
     d.collection("users").createIndex({ "stack.key": 1 }),
     d.collection("users").createIndex({ "billing.customerId": 1 }, { sparse: true }),
+    d.collection("users").createIndex({ "telegram.chatId": 1 }, { sparse: true }),
+    d.collection("users").createIndex({ "pendingTelegram.tokenHash": 1 }, { sparse: true }),
     d.collection("incidents").createIndex({ sourceId: 1 }, { unique: true }),
     d.collection("incidents").createIndex({ targets: 1, publishedAt: -1 }),
     d.collection("alerts").createIndex({ userId: 1, incidentId: 1 }, { unique: true, partialFilterExpression: { kind: "incident" } }),

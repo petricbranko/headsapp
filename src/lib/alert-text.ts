@@ -1,4 +1,4 @@
-/** Pull a short title out of a WhatsApp alert body (for compact lists). */
+/** Pull a short title out of a alert body (for compact lists). */
 export function summarizeMessage(body: string): { header: string; title: string } {
   const lines = body.split("\n").map((l) => l.trim()).filter(Boolean);
   const hi = lines.findIndex((l) => /^\*.+\*$/.test(l));
