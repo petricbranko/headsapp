@@ -281,6 +281,7 @@ function PayStep({ paywall, count, onBack }: { paywall: Paywall; count: number; 
           >
             {busy ? "Opening checkout…" : paywall.cta}
           </button>
+          {paywall.note && <p className="mt-3 text-center text-[13px] leading-relaxed text-fg-subtle">{paywall.note}</p>}
         </div>
         <button className="mt-8 text-[13px] text-fg-muted hover:text-fg" onClick={onBack}>
           ← Back to stack

@@ -33,6 +33,8 @@ export interface Paywall {
   per: string;
   features: string[];
   cta: string;
+  /** Optional fine print under the button (e.g. trial terms). */
+  note?: string;
   /** POST endpoint that returns { url } to redirect to (checkout). */
   endpoint: string;
 }
